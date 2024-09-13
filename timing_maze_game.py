@@ -9,6 +9,7 @@ from constants import *
 import constants
 from utils import *
 from players.default_player import Player as DefaultPlayer
+from players.g1_player import Player as G1_Player
 from collections import deque as queue
 import tkinter as tk
 
@@ -365,8 +366,8 @@ class TimingMazeGame:
                 returned_action = self.player.move(
                     current_percept=before_state
                 )
-            except Exception:
-                print("Exception in player code")
+            except Exception as e:
+                print(f"Exception in player code: {e}")
                 returned_action = None
 
             player_time_taken = time.time() - player_start

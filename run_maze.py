@@ -21,7 +21,7 @@ if __name__ == "__main__":
             "log_path": "log",
             "disable_logging": False,
             "disable_timeout": True,
-            "player": "d",
+            "player": "1",
         }
     )
 
