@@ -17,10 +17,10 @@ if __name__ == "__main__":
             "seed": 2,
             "maze": None,
             "scale": 9,
-            "no_gui": False,
+            "no_gui": True,
             "log_path": "log",
             "disable_logging": False,
-            "disable_timeout": False,
+            "disable_timeout": True,
             "player": "d",
         }
     )
