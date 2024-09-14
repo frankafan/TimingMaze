@@ -1,11 +1,8 @@
 from timing_maze_game import TimingMazeGame
-import tkinter as tk
 
 
-# Namespace class to store the arguments
 class Namespace:
     def __init__(self, **kwargs):
-        # Initialize the class with the given keyword arguments as attributes
         self.__dict__.update(kwargs)
 
 
