@@ -43,11 +43,11 @@ class Experience:
             )
 
             cell = (
-                cell[0] + self.cur_pos[0],
-                cell[1] + self.cur_pos[1],
+                cell[0] - self.cur_pos[0],
+                cell[1] - self.cur_pos[1],
             )
-            if (cell[0], cell[1]) not in self.seen_cells:
-                self.seen_cells.add((cell[0], cell[1]))
+            if cell not in self.seen_cells:
+                self.seen_cells.add(cell)
 
         # update walls coordinates relative to the original start position
         if right < self.r:
@@ -87,6 +87,7 @@ class Experience:
         )
         # print(f"Walls: {self.walls}")
         # print(f"Number of seen cells: {len(self.seen_cells)}")
+        print("\n")
 
         return best_move
 
