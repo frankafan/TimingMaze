@@ -78,6 +78,9 @@ class Experience:
                 bottom + self.cur_pos[1],
             )
 
+        best_move = self.get_best_move()
+        return best_move
+
     def get_best_move(self):
         """Get the move that maximizes the number of new cells seen
 
@@ -89,6 +92,30 @@ class Experience:
                 RIGHT = 2
                 DOWN = 3
         """
+        max_new_cells = 0
+        best_move = constants.WAIT
+
+        for dx, dy in [
+            (0, 1),
+            (1, 0),
+            (0, -1),
+            (-1, 0),
+        ]:  # UP, RIGHT, DOWN, LEFT
+            num_new_cells = self.get_num_new_cells(
+                self.cur_pos[0] + dx, self.cur_pos[1] + dy
+            )
+            if num_new_cells > max_new_cells:
+                max_new_cells = num_new_cells
+                if dx == 0 and dy == 1:
+                    best_move = constants.UP
+                elif dx == 1 and dy == 0:
+                    best_move = constants.RIGHT
+                elif dx == 0 and dy == -1:
+                    best_move = constants.DOWN
+                elif dx == -1 and dy == 0:
+                    best_move = constants.LEFT
+
+        return best_move
 
     def get_num_new_cells(self, x, y):
         """Get the number of new cells at a new position
