@@ -18,7 +18,8 @@ class Experience:
             float("-inf"),
             float("-inf"),
         )  # (right, top, left, bottom) coordinates relative to the original start position
-        self.wait_penalty = 0.5  # penalty multiplier for waiting
+        self.num_wait = 0  # number of times the player has waited
+        self.wait_penalty = 0.2  # penalty for waiting
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -79,17 +80,22 @@ class Experience:
                 bottom + self.cur_pos[1],
             )
 
-        best_move = self.get_best_move(current_percept)
+        move = self.get_best_move(current_percept)
 
         # print(f"Current position: {self.cur_pos}")
-        print(
-            f"Best move: {'WAIT' if best_move == constants.WAIT else 'LEFT' if best_move == constants.LEFT else 'UP' if best_move == constants.UP else 'RIGHT' if best_move == constants.RIGHT else 'DOWN'}"
-        )
+        # print(
+        #     f"Best move: {'WAIT' if move == constants.WAIT else 'LEFT' if move == constants.LEFT else 'UP' if move == constants.UP else 'RIGHT' if move == constants.RIGHT else 'DOWN'}"
+        # )
         # print(f"Walls: {self.walls}")
         # print(f"Number of seen cells: {len(self.seen_cells)}")
         print("\n")
 
-        return best_move
+        return move
+
+    def wait(self):
+        """Increment the number of times the player has waited"""
+        print(self.num_wait)
+        self.num_wait += 1
 
     def get_best_move(self, current_percept):
         """Evaluate best move
@@ -103,7 +109,6 @@ class Experience:
                 DOWN = 3
         """
         move_scores = self.get_move_scores()
-        print(f"Move scores: {move_scores}")
 
         # Normalize move scores
         for i in range(4):
@@ -117,8 +122,9 @@ class Experience:
         # Give penalty for waiting
         for i in range(4):
             if direction[i] != constants.OPEN:
-                move_scores[i] = move_scores[i] * self.wait_penalty
+                move_scores[i] = move_scores[i] - self.wait_penalty * self.num_wait
 
+        print(f"Move scores: {move_scores}")
         return move_scores.index(max(move_scores))
 
     def get_move_scores(self):
