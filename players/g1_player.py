@@ -46,4 +46,5 @@ class Player:
                 RIGHT = 2
                 DOWN = 3
         """
+        self.experience.move(current_percept)
         return constants.WAIT
