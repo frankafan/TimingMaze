@@ -89,3 +89,25 @@ class Experience:
                 RIGHT = 2
                 DOWN = 3
         """
+
+    def get_num_new_cells(self, x, y):
+        """Get the number of new cells at a new position
+
+        Args:
+            x (int): x-coordinate of the new position
+            y (int): y-coordinate of the new position
+
+        Returns:
+            int: number of new cells seen at the new position
+        """
+
+        num_new_cells = 0
+        for dx in range(-self.r, self.r + 1):
+            for dy in range(-self.r, self.r + 1):
+                if dx**2 + dy**2 <= self.r**2:
+                    if (x + dx, y + dy) not in self.seen_cells and (
+                        self.walls[2] <= x + dx <= self.walls[0]
+                        and self.walls[3] <= y + dy <= self.walls[1]
+                    ):
+                        num_new_cells += 1
+        return num_new_cells
