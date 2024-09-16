@@ -42,8 +42,8 @@ class Experience:
             )
 
             cell = (
-                cell[0] - current_percept.start_x,
-                cell[1] - current_percept.start_y,
+                cell[0] + self.cur_pos[0],
+                cell[1] + self.cur_pos[1],
             )
             if (cell[0], cell[1]) not in self.seen_cells:
                 self.seen_cells.add((cell[0], cell[1]))
@@ -79,6 +79,12 @@ class Experience:
             )
 
         best_move = self.get_best_move()
+
+        # print(f"Current position: {self.cur_pos}")
+        # print(f"Best move: {best_move}")
+        # print(f"Walls: {self.walls}")
+        # print(f"Number of seen cells: {len(self.seen_cells)}")
+
         return best_move
 
     def get_best_move(self):
@@ -96,29 +102,29 @@ class Experience:
         best_move = constants.WAIT
 
         for dx, dy in [
-            (0, 1),
             (1, 0),
             (0, -1),
             (-1, 0),
-        ]:  # UP, RIGHT, DOWN, LEFT
+            (0, 1),
+        ]:  # LEFT, UP, RIGHT, DOWN
             num_new_cells = self.get_num_new_cells(
                 self.cur_pos[0] + dx, self.cur_pos[1] + dy
             )
             if num_new_cells > max_new_cells:
                 max_new_cells = num_new_cells
-                if dx == 0 and dy == 1:
-                    best_move = constants.UP
-                elif dx == 1 and dy == 0:
-                    best_move = constants.RIGHT
-                elif dx == 0 and dy == -1:
-                    best_move = constants.DOWN
-                elif dx == -1 and dy == 0:
+                if dx == 1 and dy == 0:
                     best_move = constants.LEFT
+                elif dx == 0 and dy == -1:
+                    best_move = constants.UP
+                elif dx == -1 and dy == 0:
+                    best_move = constants.RIGHT
+                elif dx == 0 and dy == 1:
+                    best_move = constants.DOWN
 
         return best_move
 
     def get_num_new_cells(self, x, y):
-        """Get the number of new cells at a new position
+        """Get the number of new cells seen at a new position
 
         Args:
             x (int): x-coordinate of the new position
