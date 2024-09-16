@@ -48,13 +48,8 @@ class Player:
         """
         move = self.experience.move(current_percept)
 
-        direction = [0, 0, 0, 0]
-        for maze_state in current_percept.maze_state:
-            if maze_state[0] == 0 and maze_state[1] == 0:
-                direction[maze_state[2]] = maze_state[3]
-
-        if direction[move] == constants.OPEN:
+        if self.experience.is_valid_move(current_percept, move):
             return move
-        else:
-            self.experience.wait()
-            return constants.WAIT
+
+        self.experience.wait()
+        return constants.WAIT

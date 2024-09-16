@@ -113,14 +113,9 @@ class Experience:
         for i in range(4):
             move_scores[i] = move_scores[i] / max(move_scores)
 
-        direction = [0, 0, 0, 0]
-        for maze_state in current_percept.maze_state:
-            if maze_state[0] == 0 and maze_state[1] == 0:
-                direction[maze_state[2]] = maze_state[3]
-
         # Give penalty for waiting
         for i in range(4):
-            if direction[i] != constants.OPEN:
+            if not self.is_valid_move(current_percept, i):
                 move_scores[i] = (
                     move_scores[i] - self.wait_penalty * self.wait_penalty_multiplier
                 )
@@ -176,3 +171,48 @@ class Experience:
                     ):
                         num_new_cells += 1
         return num_new_cells
+
+    def is_valid_move(self, current_percept, move):
+        direction = [0, 0, 0, 0]
+        for maze_state in current_percept.maze_state:
+            if maze_state[0] == 0 and maze_state[1] == 0:
+                direction[maze_state[2]] = maze_state[3]
+
+        if move == constants.LEFT:
+            for maze_state in current_percept.maze_state:
+                if (
+                    maze_state[0] == -1
+                    and maze_state[1] == 0
+                    and maze_state[2] == constants.RIGHT
+                    and maze_state[3] == constants.OPEN
+                ):
+                    return True
+        elif move == constants.UP:
+            for maze_state in current_percept.maze_state:
+                if (
+                    maze_state[0] == 0
+                    and maze_state[1] == -1
+                    and maze_state[2] == constants.DOWN
+                    and maze_state[3] == constants.OPEN
+                ):
+                    return True
+        elif move == constants.RIGHT:
+            for maze_state in current_percept.maze_state:
+                if (
+                    maze_state[0] == 1
+                    and maze_state[1] == 0
+                    and maze_state[2] == constants.LEFT
+                    and maze_state[3] == constants.OPEN
+                ):
+                    return True
+        elif move == constants.DOWN:
+            for maze_state in current_percept.maze_state:
+                if (
+                    maze_state[0] == 0
+                    and maze_state[1] == 1
+                    and maze_state[2] == constants.UP
+                    and maze_state[3] == constants.OPEN
+                ):
+                    return True
+
+        return False
