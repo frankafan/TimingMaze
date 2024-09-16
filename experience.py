@@ -18,6 +18,7 @@ class Experience:
             float("-inf"),
             float("-inf"),
         )  # (right, top, left, bottom) coordinates relative to the original start position
+        self.wait_penalty = 0.5  # penalty multiplier for waiting
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -78,17 +79,19 @@ class Experience:
                 bottom + self.cur_pos[1],
             )
 
-        best_move = self.get_best_move()
+        best_move = self.get_best_move(current_percept)
 
         # print(f"Current position: {self.cur_pos}")
-        # print(f"Best move: {best_move}")
+        print(
+            f"Best move: {'WAIT' if best_move == constants.WAIT else 'LEFT' if best_move == constants.LEFT else 'UP' if best_move == constants.UP else 'RIGHT' if best_move == constants.RIGHT else 'DOWN'}"
+        )
         # print(f"Walls: {self.walls}")
         # print(f"Number of seen cells: {len(self.seen_cells)}")
 
         return best_move
 
-    def get_best_move(self):
-        """Get the move that maximizes the number of new cells seen
+    def get_best_move(self, current_percept):
+        """Evaluate best move
 
         Returns:
             int:
@@ -98,8 +101,32 @@ class Experience:
                 RIGHT = 2
                 DOWN = 3
         """
-        max_new_cells = 0
-        best_move = constants.WAIT
+        move_scores = self.get_move_scores()
+        print(f"Move scores: {move_scores}")
+
+        # Normalize move scores
+        for i in range(4):
+            move_scores[i] = move_scores[i] / max(move_scores)
+
+        direction = [0, 0, 0, 0]
+        for maze_state in current_percept.maze_state:
+            if maze_state[0] == 0 and maze_state[1] == 0:
+                direction[maze_state[2]] = maze_state[3]
+
+        # Give penalty for waiting
+        for i in range(4):
+            if direction[i] != constants.OPEN:
+                move_scores[i] = move_scores[i] * self.wait_penalty
+
+        return move_scores.index(max(move_scores))
+
+    def get_move_scores(self):
+        """Score each move based on the number of new cells seen
+
+        Returns:
+            list: list of scores for each move (LEFT, UP, RIGHT, DOWN)
+        """
+        move_scores = [0, 0, 0, 0]
 
         for dx, dy in [
             (1, 0),
@@ -110,18 +137,15 @@ class Experience:
             num_new_cells = self.get_num_new_cells(
                 self.cur_pos[0] + dx, self.cur_pos[1] + dy
             )
-            if num_new_cells > max_new_cells:
-                max_new_cells = num_new_cells
-                if dx == 1 and dy == 0:
-                    best_move = constants.LEFT
-                elif dx == 0 and dy == -1:
-                    best_move = constants.UP
-                elif dx == -1 and dy == 0:
-                    best_move = constants.RIGHT
-                elif dx == 0 and dy == 1:
-                    best_move = constants.DOWN
-
-        return best_move
+            if dx == 1 and dy == 0:
+                move_scores[constants.LEFT] = num_new_cells
+            elif dx == 0 and dy == -1:
+                move_scores[constants.UP] = num_new_cells
+            elif dx == -1 and dy == 0:
+                move_scores[constants.RIGHT] = num_new_cells
+            elif dx == 0 and dy == 1:
+                move_scores[constants.DOWN] = num_new_cells
+        return move_scores
 
     def get_num_new_cells(self, x, y):
         """Get the number of new cells seen at a new position

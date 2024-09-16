@@ -10,14 +10,14 @@ class Namespace:
 if __name__ == "__main__":
     args = Namespace(
         **{
-            "max_door_frequency": 5,
+            "max_door_frequency": 3,
             "radius": 15,
             "seed": 2,
             "maze": None,
             "scale": 9,
-            "no_gui": True,
-            "log_path": "log",
-            "disable_logging": False,
+            "no_gui": False,
+            "log_path": "",
+            "disable_logging": True,
             "disable_timeout": True,
             "player": "1",
         }
