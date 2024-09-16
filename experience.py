@@ -18,8 +18,8 @@ class Experience:
             float("-inf"),
             float("-inf"),
         )  # (right, top, left, bottom) coordinates relative to the original start position
-        self.num_wait = 0  # number of times the player has waited
         self.wait_penalty = 0.2  # penalty for waiting
+        self.wait_penalty_multiplier = 1  # number of times the player has waited
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -94,8 +94,7 @@ class Experience:
 
     def wait(self):
         """Increment the number of times the player has waited"""
-        print(self.num_wait)
-        self.num_wait += 1
+        self.wait_penalty_multiplier += 0.5
 
     def get_best_move(self, current_percept):
         """Evaluate best move
@@ -122,7 +121,9 @@ class Experience:
         # Give penalty for waiting
         for i in range(4):
             if direction[i] != constants.OPEN:
-                move_scores[i] = move_scores[i] - self.wait_penalty * self.num_wait
+                move_scores[i] = (
+                    move_scores[i] - self.wait_penalty * self.wait_penalty_multiplier
+                )
 
         print(f"Move scores: {move_scores}")
         return move_scores.index(max(move_scores))
