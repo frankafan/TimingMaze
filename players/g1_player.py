@@ -5,6 +5,7 @@ import logging
 
 import constants
 from timing_maze_state import TimingMazeState
+from experience import Experience
 
 
 class Player:
@@ -30,6 +31,7 @@ class Player:
         self.logger = logger
         self.maximum_door_frequency = maximum_door_frequency
         self.radius = radius
+        self.experience = Experience(self.maximum_door_frequency, self.radius)
 
     def move(self, current_percept) -> int:
         """Function which retrieves the current state of the amoeba map and returns an amoeba movement
