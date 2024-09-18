@@ -126,7 +126,6 @@ class Experience:
         move = random.choice(max_indices)
 
         print(f"Move scores: {move_scores}")
-        print(f'Move: {move}')
         return move
 
     def get_move_scores(self):
@@ -178,11 +177,15 @@ class Experience:
                         num_new_cells += 1
         return num_new_cells
 
+    # TODO: This function can be sped up by decreasing the number iterations
     def is_valid_move(self, current_percept, move):
         direction = [0, 0, 0, 0]
         for maze_state in current_percept.maze_state:
             if maze_state[0] == 0 and maze_state[1] == 0:
                 direction[maze_state[2]] = maze_state[3]
+        
+        if direction[move] != constants.OPEN:
+            return False
 
         if move == constants.LEFT:
             for maze_state in current_percept.maze_state:
@@ -198,7 +201,7 @@ class Experience:
                 if (
                     maze_state[0] == 0
                     and maze_state[1] == -1
-                    and maze_state[2] == constants.DOWN
+                    and maze_state[2] == constants.UP
                     and maze_state[3] == constants.OPEN
                 ):
                     return True
@@ -216,7 +219,7 @@ class Experience:
                 if (
                     maze_state[0] == 0
                     and maze_state[1] == 1
-                    and maze_state[2] == constants.UP
+                    and maze_state[2] == constants.DOWN
                     and maze_state[3] == constants.OPEN
                 ):
                     return True
