@@ -46,10 +46,4 @@ class Player:
                 RIGHT = 2
                 DOWN = 3
         """
-        move = self.experience.move(current_percept)
-
-        if self.experience.is_valid_move(current_percept, move):
-            return move
-
-        self.experience.wait()
-        return constants.WAIT
+        return self.experience.move(current_percept)

@@ -91,7 +91,12 @@ class Experience:
         # print(f"Number of seen cells: {len(self.seen_cells)}")
         print("\n")
 
-        return move
+        if self.is_valid_move(current_percept, move):
+            self.wait_penalty_multiplier = 1
+            return move
+        else:
+            self.wait()
+            return constants.WAIT
 
     def wait(self):
         """Increment the number of times the player has waited"""
