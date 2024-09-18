@@ -201,7 +201,7 @@ class Experience:
                 if (
                     maze_state[0] == 0
                     and maze_state[1] == -1
-                    and maze_state[2] == constants.UP
+                    and maze_state[2] == constants.DOWN
                     and maze_state[3] == constants.OPEN
                 ):
                     return True
@@ -219,7 +219,7 @@ class Experience:
                 if (
                     maze_state[0] == 0
                     and maze_state[1] == 1
-                    and maze_state[2] == constants.DOWN
+                    and maze_state[2] == constants.UP
                     and maze_state[3] == constants.OPEN
                 ):
                     return True
