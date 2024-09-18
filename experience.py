@@ -112,7 +112,7 @@ class Experience:
 
         # Normalize move scores
         for i in range(4):
-            move_scores[i] = move_scores[i] / max(move_scores)
+            move_scores[i] = move_scores[i] / max([1, max(move_scores)])
 
         # Give penalty for waiting
         for i in range(4):
@@ -183,7 +183,7 @@ class Experience:
         for maze_state in current_percept.maze_state:
             if maze_state[0] == 0 and maze_state[1] == 0:
                 direction[maze_state[2]] = maze_state[3]
-        
+
         if direction[move] != constants.OPEN:
             return False
 
