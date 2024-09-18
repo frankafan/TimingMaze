@@ -138,19 +138,19 @@ class Experience:
         move_scores = [0, 0, 0, 0]
 
         for dx, dy in [
-            (1, 0),
-            (0, -1),
             (-1, 0),
+            (0, -1),
+            (1, 0),
             (0, 1),
         ]:  # LEFT, UP, RIGHT, DOWN
             num_new_cells = self.get_num_new_cells(
                 self.cur_pos[0] + dx, self.cur_pos[1] + dy
             )
-            if dx == 1 and dy == 0:
+            if dx == -1 and dy == 0:
                 move_scores[constants.LEFT] = num_new_cells
             elif dx == 0 and dy == -1:
                 move_scores[constants.UP] = num_new_cells
-            elif dx == -1 and dy == 0:
+            elif dx == 1 and dy == 0:
                 move_scores[constants.RIGHT] = num_new_cells
             elif dx == 0 and dy == 1:
                 move_scores[constants.DOWN] = num_new_cells

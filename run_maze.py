@@ -11,8 +11,8 @@ if __name__ == "__main__":
     args = Namespace(
         **{
             "max_door_frequency": 3,
-            "radius": 15,
-            "seed": 2,
+            "radius": 30,
+            "seed": 3,
             "maze": None,
             "scale": 9,
             "no_gui": False,
