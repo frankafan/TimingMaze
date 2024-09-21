@@ -21,6 +21,7 @@ class Experience:
         )  # (right, top, left, bottom) coordinates relative to the original start position
         self.wait_penalty = 0.2  # penalty for waiting
         self.wait_penalty_multiplier = 1  # number of times the player has waited
+        self.maze_dimension = 100 # size of the maze
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
