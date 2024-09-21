@@ -100,7 +100,7 @@ class Experience:
 
     def wait(self):
         """Increment the number of times the player has waited"""
-        self.wait_penalty_multiplier += 0.5
+        self.wait_penalty_multiplier += 1
 
     def get_best_move(self, current_percept):
         """Evaluate best move
