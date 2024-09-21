@@ -21,7 +21,6 @@ class Experience:
             float("-inf"),
         )  # (right, top, left, bottom) coordinates relative to the original start position
         self.wait_penalty = 0.2  # penalty for waiting
-        self.wait_penalty_multiplier = 1  # number of times the player has waited
         self.maze_dimension = 100  # size of the maze
         self.direction_vector_weight = 1  # weight of the direction vector
         self.waits = (
@@ -99,7 +98,6 @@ class Experience:
         print("\n")
 
         if self.is_valid_move(current_percept, move):
-            self.wait_penalty_multiplier = 1
             return move
         else:
             self.wait()
@@ -107,7 +105,6 @@ class Experience:
 
     def wait(self):
         """Increment the number of times the player has waited"""
-        self.wait_penalty_multiplier += 1
         self.waits[self.cur_pos] = self.waits.get(self.cur_pos, 0) + 1
 
     def get_direction_vector(self):
@@ -148,7 +145,7 @@ class Experience:
         for i in range(4):
             if not self.is_valid_move(current_percept, i):
                 move_scores[i] = (
-                    move_scores[i] - self.wait_penalty * self.wait_penalty_multiplier
+                    move_scores[i] - self.wait_penalty * self.waits.get(self.cur_pos, 1)
                 )
 
         direction_vector = self.get_direction_vector()
