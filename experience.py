@@ -23,7 +23,10 @@ class Experience:
         self.wait_penalty = 0.2  # penalty for waiting
         self.wait_penalty_multiplier = 1  # number of times the player has waited
         self.maze_dimension = 100  # size of the maze
-        self.direction_vector_weight = 1 # weight of the direction vector
+        self.direction_vector_weight = 1  # weight of the direction vector
+        self.waits = (
+            {}
+        )  # key: (x, y), value: number of times the player has waited at that position
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -105,6 +108,7 @@ class Experience:
     def wait(self):
         """Increment the number of times the player has waited"""
         self.wait_penalty_multiplier += 1
+        self.waits[self.cur_pos] = self.waits.get(self.cur_pos, 0) + 1
 
     def get_direction_vector(self):
         direction_vector = [0, 0]  # [x, y]
