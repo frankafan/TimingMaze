@@ -23,7 +23,7 @@ class Experience:
         self.wait_penalty = 0.2  # penalty for waiting
         self.wait_penalty_multiplier = 1  # number of times the player has waited
         self.maze_dimension = 100  # size of the maze
-        self.direction_vector_scale = 1 # scale of the direction vector
+        self.direction_vector_weight = 1 # weight of the direction vector
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -151,6 +151,7 @@ class Experience:
         direction_vector = np.array(direction_vector) / np.linalg.norm(
             direction_vector
         ) * self.direction_vector_weight
+        # print(f"Direction vector: {direction_vector}")
         for i in range(4):
             if i == constants.LEFT:
                 move_scores[i] -= direction_vector[0]
