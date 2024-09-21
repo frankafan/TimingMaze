@@ -53,6 +53,7 @@ class Experience:
                 self.seen_cells.add(cell)
 
         # update walls coordinates relative to the original start position
+        # TODO: infer left wall from right wall, and bottom wall from top wall
         if right < self.r:
             self.walls = (
                 right + self.cur_pos[0],
