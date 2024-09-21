@@ -145,21 +145,23 @@ class Experience:
         for i in range(4):
             move_scores[i] = move_scores[i] / max([1, max(move_scores)])
 
-        # Give penalty for waiting
-        for i in range(4):
-            if not self.is_valid_move(current_percept, i):
-                move_scores[i] = move_scores[i] - self.wait_penalty * self.waits.get(
-                    self.cur_pos, (1, 1)
-                )[0]
-
         direction_vector = self.get_direction_vector()
+
+        # Normalize direction vector
         direction_vector = (
             np.array(direction_vector)
             / np.linalg.norm(direction_vector)
             * self.direction_vector_weight
         )
-        # print(f"Direction vector: {direction_vector}")
+
         for i in range(4):
+            # Give penalty for waiting
+            if not self.is_valid_move(current_percept, i):
+                move_scores[i] = move_scores[i] - self.wait_penalty * self.waits.get(
+                    self.cur_pos, (1, 1)
+                )[0]
+
+            # Add direction vector to move scores
             if i == constants.LEFT:
                 move_scores[i] -= direction_vector[0]
             elif i == constants.UP:
@@ -173,7 +175,8 @@ class Experience:
         max_indices = [i for i, score in enumerate(move_scores) if score == max_score]
         move = random.choice(max_indices)
 
-        print(f"Move scores: {move_scores}")
+        # print(f"Direction vector: {direction_vector}")
+        # print(f"Move scores: {move_scores}")
         return move
 
     def get_move_scores(self):
