@@ -21,7 +21,7 @@ class Experience:
         )  # (right, top, left, bottom) coordinates relative to the original start position
         self.wait_penalty = 0.2  # penalty for waiting
         self.wait_penalty_multiplier = 1  # number of times the player has waited
-        self.maze_dimension = 100 # size of the maze
+        self.maze_dimension = 100  # size of the maze
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -103,6 +103,23 @@ class Experience:
     def wait(self):
         """Increment the number of times the player has waited"""
         self.wait_penalty_multiplier += 1
+
+    def get_direction_vector(self):
+        direction_vector = [0, 0]  # [x, y]
+        for x in range(
+            max(self.walls[2], -self.maze_dimension),
+            min(self.walls[0], self.maze_dimension) + 1,
+        ):
+            for y in range(
+                max(self.walls[3], -self.maze_dimension),
+                min(self.walls[1], self.maze_dimension) + 1,
+            ):
+                direction = (x - self.cur_pos[0], y - self.cur_pos[1])
+                if (x, y) not in self.seen_cells:
+                    direction_vector[0] += direction[0]
+                    direction_vector[1] += direction[1]
+
+        return direction_vector
 
     def get_best_move(self, current_percept):
         """Evaluate best move
