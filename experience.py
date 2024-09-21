@@ -1,5 +1,6 @@
 import constants
 import random
+import numpy as np
 
 
 class Experience:
@@ -22,6 +23,7 @@ class Experience:
         self.wait_penalty = 0.2  # penalty for waiting
         self.wait_penalty_multiplier = 1  # number of times the player has waited
         self.maze_dimension = 100  # size of the maze
+        self.direction_vector_scale = 1 # scale of the direction vector
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -144,6 +146,20 @@ class Experience:
                 move_scores[i] = (
                     move_scores[i] - self.wait_penalty * self.wait_penalty_multiplier
                 )
+
+        direction_vector = self.get_direction_vector()
+        direction_vector = np.array(direction_vector) / np.linalg.norm(
+            direction_vector
+        ) * self.direction_vector_weight
+        for i in range(4):
+            if i == constants.LEFT:
+                move_scores[i] -= direction_vector[0]
+            elif i == constants.UP:
+                move_scores[i] -= direction_vector[1]
+            elif i == constants.RIGHT:
+                move_scores[i] += direction_vector[0]
+            elif i == constants.DOWN:
+                move_scores[i] += direction_vector[1]
 
         max_score = max(move_scores)
         max_indices = [i for i, score in enumerate(move_scores) if score == max_score]
