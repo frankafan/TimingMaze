@@ -26,11 +26,11 @@ class Experience:
 
         # Hyper-parameters
         self.wait_penalty = 0.2  # penalty for waiting
-        self.direction_vector_max_weight = 5  # maximum weight of the direction vector
-        self.direction_vector_multiplier = 0.005  # multiplier for the direction vector
+        self.direction_vector_max_weight = 2  # maximum weight of the direction vector
+        self.direction_vector_multiplier = 0.01  # multiplier for the direction vector
         self.direction_vector_weight = min(
             self.direction_vector_max_weight,
-            1 + self.direction_vector_multiplier * self.num_turns,
+            self.direction_vector_multiplier * self.num_turns,
         )  # weight of the direction vector
 
     def move(self, current_percept):
@@ -45,8 +45,8 @@ class Experience:
         self.num_turns += 1
         self.direction_vector_weight = min(
             self.direction_vector_max_weight,
-            1 + self.direction_vector_multiplier * self.num_turns,
-        ) # update direction vector weight
+            self.direction_vector_multiplier * self.num_turns,
+        )  # update direction vector weight
 
         # initialize coordinates for the maximum field of view relative to current position
         right, top, left, bottom = 0, 0, 0, 0
@@ -129,13 +129,13 @@ class Experience:
                 max(self.walls[3], -self.maze_dimension),
                 min(self.walls[1], self.maze_dimension) + 1,
             ):
-                direction = (x - self.cur_pos[0], y - self.cur_pos[1])
                 if (x, y) not in self.seen_cells:
+                    direction = (x - self.cur_pos[0], y - self.cur_pos[1])
                     if direction[0] != 0:
                         direction_vector[0] += 1 / direction[0]
                     if direction[1] != 0:
                         direction_vector[1] += 1 / direction[1]
-        
+
         # Normalize and add weight to direction vector
         direction_vector = (
             np.array(direction_vector)
@@ -202,7 +202,7 @@ class Experience:
         move = random.choice(max_indices)
 
         print(f"Direction vector: {direction_vector}")
-        print(f'Direction vector weight: {self.direction_vector_weight}')
+        print(f"Direction vector weight: {self.direction_vector_weight}")
         print(f"Move scores: {move_scores}")
         return move
 
