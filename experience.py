@@ -118,8 +118,10 @@ class Experience:
             ):
                 direction = (x - self.cur_pos[0], y - self.cur_pos[1])
                 if (x, y) not in self.seen_cells:
-                    direction_vector[0] += 1 / direction[0]
-                    direction_vector[1] += 1 / direction[1]
+                    if direction[0] != 0:
+                        direction_vector[0] += 1 / direction[0]
+                    if direction[1] != 0:
+                        direction_vector[1] += 1 / direction[1]
 
         return direction_vector
 
