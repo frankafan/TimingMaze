@@ -7,10 +7,12 @@ class Experience:
     def __init__(self, L, r):
         self.L = L
         self.r = r
+        self.num_turns = 0
         self.cur_pos = (
             0,
             0,
         )  # (x, y) coordinates relative to the original start position
+        self.maze_dimension = 100  # size of the maze
         self.seen_cells = (
             set()
         )  # set of tuples (x, y) storing coordinates of cells relative to the original start position
@@ -20,10 +22,16 @@ class Experience:
             float("-inf"),
             float("-inf"),
         )  # (right, top, left, bottom) coordinates relative to the original start position
-        self.wait_penalty = 0.2  # penalty for waiting
-        self.maze_dimension = 100  # size of the maze
-        self.direction_vector_weight = 1  # weight of the direction vector
         self.stays = {}  # key: (x, y), value: number of stays at the position
+
+        # Hyper-parameters
+        self.wait_penalty = 0.2  # penalty for waiting
+        self.direction_vector_max_weight = 10  # maximum weight of the direction vector
+        self.direction_vector_multiplier = 1  # multiplier for the direction vector
+        self.direction_vector_weight = min(
+            self.max_direction_vector_weight,
+            self.direction_vector_multiplier * self.num_turns,
+        )  # weight of the direction vector
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -34,6 +42,7 @@ class Experience:
 
         self.cur_pos = (-current_percept.start_x, -current_percept.start_y)
         self.stays[self.cur_pos] = self.stays.get(self.cur_pos, 0) + 1
+        self.num_turns += 1
 
         # initialize coordinates for the maximum field of view relative to current position
         right, top, left, bottom = 0, 0, 0, 0
@@ -161,16 +170,28 @@ class Experience:
             # Add direction vector to move scores
             if i == constants.LEFT:
                 move_scores[i] -= direction_vector[0]
-                move_scores[i] -= self.stays.get((self.cur_pos[0] - 1, self.cur_pos[1]), 0) * self.wait_penalty
+                move_scores[i] -= (
+                    self.stays.get((self.cur_pos[0] - 1, self.cur_pos[1]), 0)
+                    * self.wait_penalty
+                )
             elif i == constants.UP:
                 move_scores[i] -= direction_vector[1]
-                move_scores[i] -= self.stays.get((self.cur_pos[0], self.cur_pos[1] - 1), 0) * self.wait_penalty
+                move_scores[i] -= (
+                    self.stays.get((self.cur_pos[0], self.cur_pos[1] - 1), 0)
+                    * self.wait_penalty
+                )
             elif i == constants.RIGHT:
                 move_scores[i] += direction_vector[0]
-                move_scores[i] -= self.stays.get((self.cur_pos[0] + 1, self.cur_pos[1]), 0) * self.wait_penalty
+                move_scores[i] -= (
+                    self.stays.get((self.cur_pos[0] + 1, self.cur_pos[1]), 0)
+                    * self.wait_penalty
+                )
             elif i == constants.DOWN:
                 move_scores[i] += direction_vector[1]
-                move_scores[i] -= self.stays.get((self.cur_pos[0], self.cur_pos[1] + 1), 0) * self.wait_penalty
+                move_scores[i] -= (
+                    self.stays.get((self.cur_pos[0], self.cur_pos[1] + 1), 0)
+                    * self.wait_penalty
+                )
 
         max_score = max(move_scores)
         max_indices = [i for i, score in enumerate(move_scores) if score == max_score]
