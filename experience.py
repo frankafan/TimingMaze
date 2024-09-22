@@ -23,9 +23,9 @@ class Experience:
         self.wait_penalty = 0.2  # penalty for waiting
         self.maze_dimension = 100  # size of the maze
         self.direction_vector_weight = 1  # weight of the direction vector
-        self.waits = (
+        self.stays = (
             {}
-        )  # key: (x, y), value: (number of waits, number of visits) at the position
+        )  # key: (x, y), value: number of stays at the position
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -35,9 +35,7 @@ class Experience:
         """
 
         self.cur_pos = (-current_percept.start_x, -current_percept.start_y)
-        
-        waits = self.waits.get(self.cur_pos, (0, 0))
-        self.waits[self.cur_pos] = (waits[0], waits[1] + 1)
+        self.stays[self.cur_pos] = self.stays.get(self.cur_pos, 0) + 1
 
         # initialize coordinates for the maximum field of view relative to current position
         right, top, left, bottom = 0, 0, 0, 0
@@ -108,8 +106,7 @@ class Experience:
 
     def wait(self):
         """Increment the number of times the player has waited"""
-        waits = self.waits.get(self.cur_pos, (0, 0))
-        self.waits[self.cur_pos] = (waits[0] + 1, waits[1] + 1)
+        self.stays[self.cur_pos] = self.stays.get(self.cur_pos, 0) + 1
 
     def get_direction_vector(self):
         direction_vector = [0, 0]  # [x, y]
@@ -157,9 +154,9 @@ class Experience:
         for i in range(4):
             # Give penalty for waiting
             if not self.is_valid_move(current_percept, i):
-                move_scores[i] = move_scores[i] - self.wait_penalty * self.waits.get(
-                    self.cur_pos, (1, 1)
-                )[0]
+                move_scores[i] = move_scores[i] - self.wait_penalty * self.stays.get(
+                    self.cur_pos, 0
+                )
 
             # Add direction vector to move scores
             if i == constants.LEFT:
