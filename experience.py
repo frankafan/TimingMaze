@@ -121,14 +121,12 @@ class Experience:
 
     def get_direction_vector(self):
         direction_vector = [0, 0]  # [x, y]
-        for x in range(
-            max(self.walls[2], -self.maze_dimension),
-            min(self.walls[0], self.maze_dimension) + 1,
-        ):
-            for y in range(
-                max(self.walls[3], -self.maze_dimension),
-                min(self.walls[1], self.maze_dimension) + 1,
-            ):
+
+        if self.walls[0] > self.maze_dimension or self.walls[1] > self.maze_dimension or self.walls[2] < 0 or self.walls[3] < 0:
+            return direction_vector
+
+        for x in range(self.walls[2], self.walls[0]):
+            for y in range(self.walls[3], self.walls[1]):
                 if (x, y) not in self.seen_cells:
                     direction = (x - self.cur_pos[0], y - self.cur_pos[1])
                     if direction[0] != 0:
