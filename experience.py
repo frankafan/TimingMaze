@@ -161,12 +161,16 @@ class Experience:
             # Add direction vector to move scores
             if i == constants.LEFT:
                 move_scores[i] -= direction_vector[0]
+                move_scores[i] -= self.stays.get((self.cur_pos[0] - 1, self.cur_pos[1]), 0) * self.wait_penalty
             elif i == constants.UP:
                 move_scores[i] -= direction_vector[1]
+                move_scores[i] -= self.stays.get((self.cur_pos[0], self.cur_pos[1] - 1), 0) * self.wait_penalty
             elif i == constants.RIGHT:
                 move_scores[i] += direction_vector[0]
+                move_scores[i] -= self.stays.get((self.cur_pos[0] + 1, self.cur_pos[1]), 0) * self.wait_penalty
             elif i == constants.DOWN:
                 move_scores[i] += direction_vector[1]
+                move_scores[i] -= self.stays.get((self.cur_pos[0], self.cur_pos[1] + 1), 0) * self.wait_penalty
 
         max_score = max(move_scores)
         max_indices = [i for i, score in enumerate(move_scores) if score == max_score]
