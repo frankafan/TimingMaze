@@ -1,6 +1,8 @@
 from timing_maze_game import TimingMazeGame
 import tkinter as tk
+import sys
 
+sys.setrecursionlimit(10000)
 
 class Namespace:
     def __init__(self, **kwargs):
@@ -15,7 +17,7 @@ if __name__ == "__main__":
             "seed": 3,
             "maze": None,
             "scale": 9,
-            "no_gui": False,
+            "no_gui": True,
             "log_path": "",
             "disable_logging": True,
             "disable_timeout": True,
