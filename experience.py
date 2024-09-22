@@ -23,9 +23,7 @@ class Experience:
         self.wait_penalty = 0.2  # penalty for waiting
         self.maze_dimension = 100  # size of the maze
         self.direction_vector_weight = 1  # weight of the direction vector
-        self.stays = (
-            {}
-        )  # key: (x, y), value: number of stays at the position
+        self.stays = {}  # key: (x, y), value: number of stays at the position
 
     def move(self, current_percept):
         """Update experience with new cell seen in this move
@@ -120,8 +118,8 @@ class Experience:
             ):
                 direction = (x - self.cur_pos[0], y - self.cur_pos[1])
                 if (x, y) not in self.seen_cells:
-                    direction_vector[0] += direction[0]
-                    direction_vector[1] += direction[1]
+                    direction_vector[0] += 1 / direction[0]
+                    direction_vector[1] += 1 / direction[1]
 
         return direction_vector
 
