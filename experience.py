@@ -27,7 +27,7 @@ class Experience:
         # Hyper-parameters
         self.wait_penalty = 0.2  # penalty for waiting
         self.direction_vector_max_weight = 5  # maximum weight of the direction vector
-        self.direction_vector_multiplier = 0.05  # multiplier for the direction vector
+        self.direction_vector_multiplier = 0.005  # multiplier for the direction vector
         self.direction_vector_weight = min(
             self.direction_vector_max_weight,
             1 + self.direction_vector_multiplier * self.num_turns,
@@ -43,6 +43,10 @@ class Experience:
         self.cur_pos = (-current_percept.start_x, -current_percept.start_y)
         self.stays[self.cur_pos] = self.stays.get(self.cur_pos, 0) + 1
         self.num_turns += 1
+        self.direction_vector_weight = min(
+            self.direction_vector_max_weight,
+            1 + self.direction_vector_multiplier * self.num_turns,
+        ) # update direction vector weight
 
         # initialize coordinates for the maximum field of view relative to current position
         right, top, left, bottom = 0, 0, 0, 0
@@ -197,8 +201,9 @@ class Experience:
         max_indices = [i for i, score in enumerate(move_scores) if score == max_score]
         move = random.choice(max_indices)
 
-        # print(f"Direction vector: {direction_vector}")
-        # print(f"Move scores: {move_scores}")
+        print(f"Direction vector: {direction_vector}")
+        print(f'Direction vector weight: {self.direction_vector_weight}')
+        print(f"Move scores: {move_scores}")
         return move
 
     def get_move_scores(self):
