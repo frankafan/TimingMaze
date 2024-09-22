@@ -26,11 +26,11 @@ class Experience:
 
         # Hyper-parameters
         self.wait_penalty = 0.2  # penalty for waiting
-        self.direction_vector_max_weight = 10  # maximum weight of the direction vector
-        self.direction_vector_multiplier = 1  # multiplier for the direction vector
+        self.direction_vector_max_weight = 5  # maximum weight of the direction vector
+        self.direction_vector_multiplier = 0.05  # multiplier for the direction vector
         self.direction_vector_weight = min(
-            self.max_direction_vector_weight,
-            self.direction_vector_multiplier * self.num_turns,
+            self.direction_vector_max_weight,
+            1 + self.direction_vector_multiplier * self.num_turns,
         )  # weight of the direction vector
 
     def move(self, current_percept):
@@ -131,6 +131,13 @@ class Experience:
                         direction_vector[0] += 1 / direction[0]
                     if direction[1] != 0:
                         direction_vector[1] += 1 / direction[1]
+        
+        # Normalize and add weight to direction vector
+        direction_vector = (
+            np.array(direction_vector)
+            / np.linalg.norm(direction_vector)
+            * self.direction_vector_weight
+        )
 
         return direction_vector
 
@@ -152,13 +159,6 @@ class Experience:
             move_scores[i] = move_scores[i] / max([1, max(move_scores)])
 
         direction_vector = self.get_direction_vector()
-
-        # Normalize direction vector
-        direction_vector = (
-            np.array(direction_vector)
-            / np.linalg.norm(direction_vector)
-            * self.direction_vector_weight
-        )
 
         for i in range(4):
             # Give penalty for waiting
