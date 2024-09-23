@@ -5,6 +5,15 @@ import numpy as np
 
 class Experience:
     def __init__(self, L, r):
+        # Hyper-parameters
+        self.wait_penalty = 0.2  # penalty for waiting
+        self.revisit_penalty = 0.3  # penalty for revisiting a cell
+        self.direction_vector_max_weight = 2  # maximum weight of the direction vector
+        self.direction_vector_multiplier = 0.01  # multiplier for the direction vector
+        self.direction_vector_pov_radius = (
+            30  # radius of the field of view for the direction vector
+        )
+
         self.L = L
         self.r = r
         self.num_turns = 0
@@ -23,12 +32,6 @@ class Experience:
             float("-inf"),
         )  # (right, top, left, bottom) coordinates relative to the original start position
         self.stays = {}  # key: (x, y), value: number of stays at the position
-
-        # Hyper-parameters
-        self.wait_penalty = 0.2  # penalty for waiting
-        self.revisit_penalty = 0.3  # penalty for revisiting a cell
-        self.direction_vector_max_weight = 2  # maximum weight of the direction vector
-        self.direction_vector_multiplier = 0.01  # multiplier for the direction vector
         self.direction_vector_weight = min(
             self.direction_vector_max_weight,
             self.direction_vector_multiplier * self.num_turns,
@@ -123,12 +126,12 @@ class Experience:
     def get_direction_vector(self):
         direction_vector = [0, 0]  # [x, y]
         for x in range(
-            max(self.walls[2], -self.maze_dimension),
-            min(self.walls[0], self.maze_dimension) + 1,
+            max(self.cur_pos[0] - self.direction_vector_pov_radius, self.walls[2]),
+            min(self.cur_pos[0] + self.direction_vector_pov_radius, self.walls[0]),
         ):
             for y in range(
-                max(self.walls[3], -self.maze_dimension),
-                min(self.walls[1], self.maze_dimension) + 1,
+                max(self.cur_pos[1] - self.direction_vector_pov_radius, self.walls[3]),
+                min(self.cur_pos[1] + self.direction_vector_pov_radius + 1, self.walls[1]),
             ):
                 if (x, y) not in self.seen_cells:
                     direction = (x - self.cur_pos[0], y - self.cur_pos[1])
