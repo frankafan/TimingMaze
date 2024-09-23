@@ -26,6 +26,7 @@ class Experience:
 
         # Hyper-parameters
         self.wait_penalty = 0.2  # penalty for waiting
+        self.revisit_penalty = 0.3  # penalty for revisiting a cell
         self.direction_vector_max_weight = 2  # maximum weight of the direction vector
         self.direction_vector_multiplier = 0.01  # multiplier for the direction vector
         self.direction_vector_weight = min(
@@ -176,25 +177,25 @@ class Experience:
                 move_scores[i] -= direction_vector[0]
                 move_scores[i] -= (
                     self.stays.get((self.cur_pos[0] - 1, self.cur_pos[1]), 0)
-                    * self.wait_penalty
+                    * self.revisit_penalty
                 )
             elif i == constants.UP:
                 move_scores[i] -= direction_vector[1]
                 move_scores[i] -= (
                     self.stays.get((self.cur_pos[0], self.cur_pos[1] - 1), 0)
-                    * self.wait_penalty
+                    * self.revisit_penalty
                 )
             elif i == constants.RIGHT:
                 move_scores[i] += direction_vector[0]
                 move_scores[i] -= (
                     self.stays.get((self.cur_pos[0] + 1, self.cur_pos[1]), 0)
-                    * self.wait_penalty
+                    * self.revisit_penalty
                 )
             elif i == constants.DOWN:
                 move_scores[i] += direction_vector[1]
                 move_scores[i] -= (
                     self.stays.get((self.cur_pos[0], self.cur_pos[1] + 1), 0)
-                    * self.wait_penalty
+                    * self.revisit_penalty
                 )
 
         max_score = max(move_scores)
