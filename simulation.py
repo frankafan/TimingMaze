@@ -3,7 +3,7 @@ import os
 import json
 import time
 import numpy as np
-from timing_maze_game import TimingMazeGame
+from timing_maze_game_simulation import TimingMazeGame
 from collections import defaultdict
 import tkinter as tk
 

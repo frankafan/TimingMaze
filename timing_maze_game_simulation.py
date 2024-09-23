@@ -89,13 +89,13 @@ class TimingMazeGame:
         self.radius = args.radius
         self.goal_reached = False
         self.turns = 0
-        self.max_turns = 1e10
+        self.max_turns = 1500
         self.valid_moves = 0
         self.map_state = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
         self.map_frequencies = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
 
         self.add_player(args.player)
-        self.initialize(args.maze)
+        # self.initialize(args.maze)
 
     def add_player(self, player_in):
         if player_in in constants.possible_players:
