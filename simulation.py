@@ -6,6 +6,9 @@ import numpy as np
 from timing_maze_game_simulation import TimingMazeGame
 from collections import defaultdict
 import tkinter as tk
+import sys
+
+sys.setrecursionlimit(10000)
 
 
 def run_simulation(max_door_frequencies, radii, num_maps_per_config):
