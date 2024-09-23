@@ -95,7 +95,7 @@ class TimingMazeGame:
         self.map_frequencies = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
 
         self.add_player(args.player)
-        self.initialize(args.maze)
+        # self.initialize(args.maze)
 
     def add_player(self, player_in):
         if player_in in constants.possible_players:
