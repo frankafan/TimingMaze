@@ -100,6 +100,7 @@ class TimingMazeGame:
         )
 
         self.wait_penalty = args.wait_penalty
+        self.wait_max_penalty = args.wait_max_penalty
         self.revisit_penalty = args.revisit_penalty
         self.revisit_max_penalty = args.revisit_max_penalty
         self.direction_vector_max_weight = args.direction_vector_max_weight
@@ -142,6 +143,7 @@ class TimingMazeGame:
                     maximum_door_frequency=self.max_door_frequency,
                     radius=self.radius,
                     wait_penalty=self.wait_penalty,
+                    wait_max_penalty=self.wait_max_penalty,
                     revisit_penalty=self.revisit_penalty,
                     revisit_max_penalty=self.revisit_max_penalty,
                     direction_vector_max_weight=self.direction_vector_max_weight,
