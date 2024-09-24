@@ -151,8 +151,8 @@ def convert_numpy_types(data):
 
 
 def main():
-    max_door_frequencies = [3]
-    radii = [30]
+    max_door_frequencies = [3, 5, 10, 20]
+    radii = [5, 20, 40, 150]
     num_maps_per_config = 1
     wait_penalties = [0.1, 0.15, 0.2, 0.3]
     revisit_penalties = [0.1, 0.15, 0.2, 0.3]
