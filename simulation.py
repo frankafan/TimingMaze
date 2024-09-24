@@ -22,7 +22,7 @@ def run_simulation(
     direction_vector_multipliers,
     direction_vector_pov_radii,
 ):
-    results = defaultdict(list)
+    results = []
     summary = []
 
     for max_door_frequency in max_door_frequencies:
@@ -68,17 +68,25 @@ def run_simulation(
                                         finally:
                                             end_time = time.time()
                                             result = {
+                                                "max_door_frequency": max_door_frequency,
+                                                "radius": radius,
+                                                "seed": seed,
+                                                "wait_penalty": wait_penalty,
+                                                "revisit_penalty": revisit_penalty,
+                                                "revisit_max_penalty": revisit_max_penalty,
+                                                "direction_vector_max_weight": direction_vector_max_weight,
+                                                "direction_vector_multiplier": direction_vector_multiplier,
+                                                "direction_vector_pov_radius": direction_vector_pov_radius,
                                                 "turns": game.turns,
                                                 "valid_moves": game.valid_moves,
                                                 "time_taken": end_time - start_time,
                                                 "goal_reached": game.cur_pos[0]
                                                 == game.end_pos[0]
                                                 and game.cur_pos[1] == game.end_pos[1],
+                                                "is_end_visible": game.is_end_visible,
                                             }
                                             # Convert tuple to string for JSON compatibility
-                                            results[
-                                                f"mdf_{max_door_frequency}_r_{radius}_s_{seed}_wp_{wait_penalty}_rp_{revisit_penalty}_rmp_{revisit_max_penalty}_dw_{direction_vector_max_weight}_dm_{direction_vector_multiplier}_dr_{direction_vector_pov_radius}"
-                                            ].append(result)
+                                            results.append(result)
 
                                             summary.append(
                                                 {
@@ -97,10 +105,6 @@ def run_simulation(
                                                     "direction_vector_pov_radius": direction_vector_pov_radius,
                                                 }
                                             )
-
-    return results, summary
-    results = defaultdict(list)
-    summary = []
 
     return results, summary
 
