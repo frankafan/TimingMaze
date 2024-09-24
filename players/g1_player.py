@@ -37,7 +37,16 @@ class Player:
         self.logger = logger
         self.maximum_door_frequency = maximum_door_frequency
         self.radius = radius
-        self.experience = Experience(self.maximum_door_frequency, self.radius)
+        self.experience = Experience(
+            self.maximum_door_frequency,
+            self.radius,
+            wait_penalty=wait_penalty,
+            revisit_penalty=revisit_penalty,
+            revisit_max_penalty=revisit_max_penalty,
+            direction_vector_max_weight=direction_vector_max_weight,
+            direction_vector_multiplier=direction_vector_multiplier,
+            direction_vector_pov_radius=direction_vector_pov_radius,
+        )
 
     def move(self, current_percept) -> int:
         """Function which retrieves the current state of the amoeba map and returns an amoeba movement
