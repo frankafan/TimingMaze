@@ -2,6 +2,7 @@
 *.png
 *.pkl
 *.csv
+!simulation_summary.csv
 log/
 **/__pycache__/
 players/__pycache__/
