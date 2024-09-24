@@ -168,11 +168,11 @@ def main():
     max_door_frequencies = [10]
     radii = [5, 20, 40]
     num_maps_per_config = 3
-    wait_penalties = [0.1, 0.2, 0.3]
+    wait_penalties = [0.2, 0.4]
     wait_max_penalties = [3, 5]
     revisit_penalties = [0.15, 0.3]
     revisit_max_penalties = [2, 5]
-    direction_vector_max_weights = [2, 5]
+    direction_vector_max_weights = [3, 5]
     direction_vector_multipliers = [0.02]
     direction_vector_pov_radii = [25, 50]
 
