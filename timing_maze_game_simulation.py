@@ -94,6 +94,7 @@ class TimingMazeGame:
         self.map_state = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
         self.map_frequencies = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
 
+        self.wait_penalty = args.wait_penalty
         self.add_player(args.player)
         # self.initialize(args.maze)
 
@@ -120,7 +121,7 @@ class TimingMazeGame:
                 start_time = time.time()
                 player = player_class(rng=self.rng, logger=self.get_player_logger(player_name),
                                       precomp_dir=precomp_dir, maximum_door_frequency=self.max_door_frequency,
-                                      radius=self.radius)
+                                      radius=self.radius, wait_penalty = self.wait_penalty)
                 if self.use_timeout:
                     signal.alarm(0)  # Clear alarm
             except TimeoutException:

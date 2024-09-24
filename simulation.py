@@ -11,55 +11,57 @@ import sys
 sys.setrecursionlimit(10000)
 
 
-def run_simulation(max_door_frequencies, radii, num_maps_per_config):
+def run_simulation(max_door_frequencies, radii, num_maps_per_config, wait_penalty):
     results = defaultdict(list)
     summary = []
 
     for max_door_frequency in max_door_frequencies:
         for radius in radii:
             for seed in range(num_maps_per_config):
-                args = argparse.Namespace(
-                    max_door_frequency=max_door_frequency,
-                    radius=radius,
-                    seed=seed,
-                    maze=None,
-                    scale=9,
-                    no_gui=True,
-                    log_path=f"logs/mdf{max_door_frequency}_r{radius}_s{seed}.log",
-                    disable_logging=False,
-                    disable_timeout=True,
-                    player="1",
-                )
-
-                root = tk.Tk()
-                game = TimingMazeGame(args, root)
-
-                start_time = time.time()
-                try:
-                    game.initialize(None)
-                finally:
-                    end_time = time.time()
-                    result = {
-                        "turns": game.turns,
-                        "valid_moves": game.valid_moves,
-                        "time_taken": end_time - start_time,
-                        "goal_reached": game.cur_pos[0] == game.end_pos[0]
-                        and game.cur_pos[1] == game.end_pos[1],
-                    }
-                    # Convert tuple to string for JSON compatibility
-                    results[f"mdf_{max_door_frequency}_r_{radius}_s_{seed}"].append(
-                        result
+                for wait_penalty in wait_penalties:
+                    args = argparse.Namespace(
+                        max_door_frequency=max_door_frequency,
+                        radius=radius,
+                        seed=seed,
+                        maze=None,
+                        scale=9,
+                        no_gui=True,
+                        log_path=f"logs/mdf{max_door_frequency}_r{radius}_s{seed}.log",
+                        disable_logging=False,
+                        disable_timeout=True,
+                        player="1",
+                        wait_penalty=wait_penalty,
                     )
 
-                    summary.append(
-                        {
-                            "max_door_frequency": max_door_frequency,
-                            "radius": radius,
-                            "seed": seed,
+                    root = tk.Tk()
+                    game = TimingMazeGame(args, root)
+
+                    start_time = time.time()
+                    try:
+                        game.initialize(None)
+                    finally:
+                        end_time = time.time()
+                        result = {
                             "turns": game.turns,
-                            "goal_reached": result["goal_reached"],
+                            "valid_moves": game.valid_moves,
+                            "time_taken": end_time - start_time,
+                            "goal_reached": game.cur_pos[0] == game.end_pos[0]
+                            and game.cur_pos[1] == game.end_pos[1],
                         }
-                    )
+                        # Convert tuple to string for JSON compatibility
+                        results[f"mdf_{max_door_frequency}_r_{radius}_s_{seed}"].append(
+                            result
+                        )
+
+                        summary.append(
+                            {
+                                "max_door_frequency": max_door_frequency,
+                                "radius": radius,
+                                "seed": seed,
+                                "turns": game.turns,
+                                "goal_reached": result["goal_reached"],
+                            }
+                        )
 
     return results, summary
     results = defaultdict(list)
@@ -154,11 +156,14 @@ def main():
     max_door_frequencies = [3]
     radii = [30]
     num_maps_per_config = 1
+    wait_penalties = [0.2]
     output_dir = "simulation_results"
 
     all_summary = []
 
-    results, summary = run_simulation(max_door_frequencies, radii, num_maps_per_config)
+    results, summary = run_simulation(
+        max_door_frequencies, radii, num_maps_per_config, wait_penalties
+    )
     save_results(results, output_dir)
     all_summary.extend(summary)
     print(f"Simulation complete")
