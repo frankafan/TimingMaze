@@ -52,7 +52,7 @@ def run_simulation(
                                             scale=9,
                                             no_gui=True,
                                             log_path=f"logs/mdf{max_door_frequency}_r{radius}_s{seed}.log",
-                                            disable_logging=False,
+                                            disable_logging=True,
                                             disable_timeout=True,
                                             player="1",
                                             wait_penalty=wait_penalty,
@@ -157,16 +157,16 @@ def convert_numpy_types(data):
 
 
 def main():
-    max_door_frequencies = [3, 5, 10, 20]
-    radii = [5, 20, 40, 150]
-    num_maps_per_config = 50
+    max_door_frequencies = [3, 10, 20]
+    radii = [5, 20, 40]
+    num_maps_per_config = 10
     wait_penalties = [0.1, 0.2, 0.3]
-    revisit_penalties = [0.1, 0.2, 0.3]
-    revisit_max_penalties = [0.5, 1, 2, 3]
-    direction_vector_max_weights = [0.5, 1, 2, 3]
-    direction_vector_multipliers = [0.01, 0.05, 0.1]
+    wait_max_penalties = [3, 5]
+    revisit_penalties = [0.15, 0.3]
+    revisit_max_penalties = [2, 5]
+    direction_vector_max_weights = [2, 5]
+    direction_vector_multipliers = [0.02]
     direction_vector_pov_radii = [25, 50]
-
 
     results, summary = run_simulation(
         max_door_frequencies,

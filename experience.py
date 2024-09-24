@@ -9,6 +9,7 @@ class Experience:
         L,
         r,
         wait_penalty=0.2,
+        wait_max_penalty=5,
         revisit_penalty=0.1,
         revisit_max_penalty=1,
         direction_vector_max_weight=2,
@@ -17,6 +18,7 @@ class Experience:
     ):
         # Hyper-parameters
         self.wait_penalty = wait_penalty  # penalty for waiting
+        self.wait_max_penalty = wait_max_penalty  # maximum penalty for waiting
         self.revisit_penalty = revisit_penalty  # penalty for revisiting a cell
         self.revisit_max_penalty = (
             revisit_max_penalty  # maximum penalty for revisiting a cell
@@ -200,8 +202,9 @@ class Experience:
         for i in range(4):
             # Give penalty for waiting
             if not self.is_valid_move(current_percept, i):
-                move_scores[i] = move_scores[i] - self.wait_penalty * self.stays.get(
-                    self.cur_pos, 0
+                move_scores[i] = move_scores[i] - min(
+                    self.wait_penalty * self.stays.get(self.cur_pos, 0),
+                    self.wait_max_penalty,
                 )
 
             # Add direction vector to move scores
