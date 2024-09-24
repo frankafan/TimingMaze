@@ -169,7 +169,7 @@ def main():
     radii = [5, 20, 40]
     num_maps_per_config = 3
     wait_penalties = [0.2, 0.4]
-    wait_max_penalties = [3, 5]
+    wait_max_penalties = [float("inf")]
     revisit_penalties = [0.15, 0.3]
     revisit_max_penalties = [2, 5]
     direction_vector_max_weights = [3, 5]
