@@ -9,7 +9,7 @@ import tkinter as tk
 import sys
 
 sys.setrecursionlimit(10000)
-output_dir = "simulation_results"
+output_dir = "vm1_simulation_results"
 
 
 def run_simulation(
