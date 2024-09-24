@@ -106,6 +106,8 @@ class TimingMazeGame:
         self.direction_vector_multiplier = args.direction_vector_multiplier
         self.direction_vector_pov_radius = args.direction_vector_pov_radius
 
+        self.is_end_visible = False
+
         self.add_player(args.player)
         # self.initialize(args.maze)
 
@@ -511,7 +513,7 @@ class TimingMazeGame:
             )
             return
 
-        if self.turns < self.max_turns:
+        if self.turns < self.max_turns and not is_end_visible:
             if self.use_gui:
                 if self.game_state == "resume":
                     if self.game_speed == "normal":
@@ -524,6 +526,7 @@ class TimingMazeGame:
             print("Goal not reached...\n\n")
             self.game_state = "over"
             self.end_time = time.time()
+            self.is_end_visible = is_end_visible
             print(
                 "\nTime taken: {}\nValid moves: {}\n".format(
                     self.end_time - self.start_time, self.valid_moves
