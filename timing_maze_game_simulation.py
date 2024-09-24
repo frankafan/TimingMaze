@@ -13,6 +13,7 @@ from players.g1_player import Player as G1_Player
 from collections import deque as queue
 import tkinter as tk
 
+
 class TimingMazeGame:
     # Direction vectors
     dRow = [-1, 0, 1, 0]
@@ -49,15 +50,15 @@ class TimingMazeGame:
             self.log_dir = args.log_path
             if self.log_dir:
                 os.makedirs(self.log_dir, exist_ok=True)
-            fh = logging.FileHandler(os.path.join(self.log_dir, 'debug.log'), mode="w")
+            fh = logging.FileHandler(os.path.join(self.log_dir, "debug.log"), mode="w")
             fh.setLevel(logging.DEBUG)
-            fh.setFormatter(logging.Formatter('%(message)s'))
+            fh.setFormatter(logging.Formatter("%(message)s"))
             fh.addFilter(MainLoggingFilter(__name__))
             self.logger.addHandler(fh)
             result_path = os.path.join(self.log_dir, "results.log")
             rfh = logging.FileHandler(result_path, mode="w")
             rfh.setLevel(logging.INFO)
-            rfh.setFormatter(logging.Formatter('%(message)s'))
+            rfh.setFormatter(logging.Formatter("%(message)s"))
             rfh.addFilter(MainLoggingFilter(__name__))
             self.logger.addHandler(rfh)
         else:
@@ -69,14 +70,16 @@ class TimingMazeGame:
                     os.makedirs(self.log_dir, exist_ok=True)
                 rfh = logging.FileHandler(result_path, mode="w")
                 rfh.setLevel(logging.INFO)
-                rfh.setFormatter(logging.Formatter('%(message)s'))
+                rfh.setFormatter(logging.Formatter("%(message)s"))
                 rfh.addFilter(MainLoggingFilter(__name__))
                 self.logger.addHandler(rfh)
             else:
                 self.logger.setLevel(logging.ERROR)
                 self.logger.disabled = True
 
-        self.logger.info("Initialise random number generator with seed {}".format(args.seed))
+        self.logger.info(
+            "Initialise random number generator with seed {}".format(args.seed)
+        )
 
         self.rng = np.random.default_rng(args.seed)
 
@@ -92,15 +95,23 @@ class TimingMazeGame:
         self.max_turns = 1500
         self.valid_moves = 0
         self.map_state = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
-        self.map_frequencies = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
+        self.map_frequencies = np.zeros(
+            (constants.map_dim, constants.map_dim, 4), dtype=int
+        )
 
         self.wait_penalty = args.wait_penalty
+        self.revisit_penalty = args.revisit_penalty
+        self.revisit_max_penalty = args.revisit_max_penalty
+        self.direction_vector_max_weight = args.direction_vector_max_weight
+        self.direction_vector_multiplier = args.direction_vector_multiplier
+        self.direction_vector_pov_radius = args.direction_vector_pov_radius
+
         self.add_player(args.player)
         # self.initialize(args.maze)
 
     def add_player(self, player_in):
         if player_in in constants.possible_players:
-            if player_in.lower() == 'd':
+            if player_in.lower() == "d":
                 player_class = DefaultPlayer
                 player_name = "Default Player"
             else:
@@ -108,7 +119,10 @@ class TimingMazeGame:
                 player_name = "Group {}".format(player_in)
 
             self.logger.info(
-                "Adding player {} from class {}".format(player_name, player_class.__module__))
+                "Adding player {} from class {}".format(
+                    player_name, player_class.__module__
+                )
+            )
             precomp_dir = os.path.join("precomp", player_name)
             os.makedirs(precomp_dir, exist_ok=True)
 
@@ -119,26 +133,45 @@ class TimingMazeGame:
                 signal.alarm(constants.timeout)
             try:
                 start_time = time.time()
-                player = player_class(rng=self.rng, logger=self.get_player_logger(player_name),
-                                      precomp_dir=precomp_dir, maximum_door_frequency=self.max_door_frequency,
-                                      radius=self.radius, wait_penalty = self.wait_penalty)
+                player = player_class(
+                    rng=self.rng,
+                    logger=self.get_player_logger(player_name),
+                    precomp_dir=precomp_dir,
+                    maximum_door_frequency=self.max_door_frequency,
+                    radius=self.radius,
+                    wait_penalty=self.wait_penalty,
+                    revisit_penalty=self.revisit_penalty,
+                    revisit_max_penalty=self.revisit_max_penalty,
+                    direction_vector_max_weight=self.direction_vector_max_weight,
+                    direction_vector_multiplier=selfdirection_vector_multiplier,
+                    direction_vector_pov_radius=self.direction_vector_pov_radius,
+                )
                 if self.use_timeout:
                     signal.alarm(0)  # Clear alarm
             except TimeoutException:
                 is_timeout = True
                 player = None
                 self.logger.error(
-                    "Initialization Timeout {} since {:.3f}s reached.".format(player_name, constants.timeout))
+                    "Initialization Timeout {} since {:.3f}s reached.".format(
+                        player_name, constants.timeout
+                    )
+                )
 
             init_time = time.time() - start_time
 
             if not is_timeout:
-                self.logger.info("Initializing player {} took {:.3f}s".format(player_name, init_time))
+                self.logger.info(
+                    "Initializing player {} took {:.3f}s".format(player_name, init_time)
+                )
             self.player = player
             self.player_name = player_name
 
         else:
-            self.logger.error("Failed to insert player {} since invalid player name provided.".format(player_in))
+            self.logger.error(
+                "Failed to insert player {} since invalid player name provided.".format(
+                    player_in
+                )
+            )
 
     def get_player_logger(self, player_name):
         player_logger = logging.getLogger("{}.{}".format(__name__, player_name))
@@ -146,9 +179,11 @@ class TimingMazeGame:
         if self.do_logging:
             player_logger.setLevel(logging.INFO)
             # add handler to self.logger with filtering
-            player_fh = logging.FileHandler(os.path.join(self.log_dir, '{}.log'.format(player_name)), mode="w")
+            player_fh = logging.FileHandler(
+                os.path.join(self.log_dir, "{}.log".format(player_name)), mode="w"
+            )
             player_fh.setLevel(logging.DEBUG)
-            player_fh.setFormatter(logging.Formatter('%(message)s'))
+            player_fh.setFormatter(logging.Formatter("%(message)s"))
             player_fh.addFilter(PlayerLoggingFilter(player_name))
             self.logger.addHandler(player_fh)
         else:
@@ -177,13 +212,24 @@ class TimingMazeGame:
             # Generate a frequency for each cell between 0 and max_door_frequency using the rng
             # self.logger.info("Generating random maze using seed {}".format(self.rng.bit_generator.seed))
             while 1:
-                self.cur_pos = np.array([self.rng.integers(0, constants.map_dim),
-                                         self.rng.integers(0, constants.map_dim)])
+                self.cur_pos = np.array(
+                    [
+                        self.rng.integers(0, constants.map_dim),
+                        self.rng.integers(0, constants.map_dim),
+                    ]
+                )
                 self.start_pos = self.cur_pos.copy()
                 while 1:
-                    self.end_pos = np.array([self.rng.integers(0, constants.map_dim),
-                                             self.rng.integers(0, constants.map_dim)])
-                    if self.end_pos[0] != self.cur_pos[0] and self.end_pos[1] != self.cur_pos[1]:
+                    self.end_pos = np.array(
+                        [
+                            self.rng.integers(0, constants.map_dim),
+                            self.rng.integers(0, constants.map_dim),
+                        ]
+                    )
+                    if (
+                        self.end_pos[0] != self.cur_pos[0]
+                        and self.end_pos[1] != self.cur_pos[1]
+                    ):
                         break
 
                 # Generate a random map
@@ -193,14 +239,16 @@ class TimingMazeGame:
                             if self.rng.random() < constants.CLOSED_PROB:
                                 self.map_frequencies[i][j][k] = 0
                             else:
-                                self.map_frequencies[i][j][k] = self.rng.integers(1, self.max_door_frequency)
+                                self.map_frequencies[i][j][k] = self.rng.integers(
+                                    1, self.max_door_frequency
+                                )
 
                 # Assign n=0 to all boundary doors
-                for i in range (constants.map_dim):
+                for i in range(constants.map_dim):
                     self.map_frequencies[0][i][constants.LEFT] = 0
-                    self.map_frequencies[constants.map_dim-1][i][constants.RIGHT] = 0
+                    self.map_frequencies[constants.map_dim - 1][i][constants.RIGHT] = 0
                     self.map_frequencies[i][0][constants.UP] = 0
-                    self.map_frequencies[i][constants.map_dim-1][constants.DOWN] = 0
+                    self.map_frequencies[i][constants.map_dim - 1][constants.DOWN] = 0
 
                 if self.validate_maze():
                     break
@@ -224,7 +272,12 @@ class TimingMazeGame:
         self.map_state = self.map_frequencies.copy()
 
         if self.use_gui:
-            self.canvas = tk.Canvas(self.root, height=self.canvas_height, width=self.canvas_width, bg="#FCF1E3")
+            self.canvas = tk.Canvas(
+                self.root,
+                height=self.canvas_height,
+                width=self.canvas_width,
+                bg="#FCF1E3",
+            )
             self.canvas.pack()
             self.draw_grid()
             self.root.mainloop()
@@ -241,7 +294,10 @@ class TimingMazeGame:
         for i in range(constants.map_dim):
             for j in range(constants.map_dim):
                 for k in range(4):
-                    if self.map_frequencies[i][j][k] < 0 or self.map_frequencies[i][j][k] > self.max_door_frequency:
+                    if (
+                        self.map_frequencies[i][j][k] < 0
+                        or self.map_frequencies[i][j][k] > self.max_door_frequency
+                    ):
                         print("Error with frequency")
                         return False
 
@@ -250,22 +306,32 @@ class TimingMazeGame:
             if self.map_frequencies[0][i][constants.LEFT] != 0:
                 print("Error with UP")
                 return False
-            if self.map_frequencies[constants.map_dim-1][i][constants.RIGHT] != 0:
+            if self.map_frequencies[constants.map_dim - 1][i][constants.RIGHT] != 0:
                 print("Error with DOWN")
                 return False
             if self.map_frequencies[i][0][constants.UP] != 0:
                 print("Error with LEFT")
                 return False
-            if self.map_frequencies[i][constants.map_dim-1][constants.DOWN] != 0:
+            if self.map_frequencies[i][constants.map_dim - 1][constants.DOWN] != 0:
                 print("Error with RIGHT")
                 return False
 
         # Check that map has a valid start and end position.
-        if self.cur_pos[0] < 0 or self.cur_pos[0] >= constants.map_dim or self.cur_pos[1] < 0 or self.cur_pos[1] >= constants.map_dim:
+        if (
+            self.cur_pos[0] < 0
+            or self.cur_pos[0] >= constants.map_dim
+            or self.cur_pos[1] < 0
+            or self.cur_pos[1] >= constants.map_dim
+        ):
             print("Error with start")
             return False
 
-        if self.end_pos[0] < 0 or self.end_pos[0] >= constants.map_dim or self.end_pos[1] < 0 or self.end_pos[1] >= constants.map_dim:
+        if (
+            self.end_pos[0] < 0
+            or self.end_pos[0] >= constants.map_dim
+            or self.end_pos[1] < 0
+            or self.end_pos[1] >= constants.map_dim
+        ):
             print("Error with end")
             return False
 
@@ -280,18 +346,29 @@ class TimingMazeGame:
                 for k in range(4):
                     if self.map_frequencies[i][j][k] != 0:
                         if k == constants.LEFT:
-                            if i > 0 and self.map_frequencies[i-1][j][constants.RIGHT] != 0:
+                            if (
+                                i > 0
+                                and self.map_frequencies[i - 1][j][constants.RIGHT] != 0
+                            ):
                                 graph[i][j][k] = 1
                         elif k == constants.RIGHT:
-                            if i < constants.map_dim-1 and self.map_frequencies[i+1][j][constants.LEFT] != 0:
+                            if (
+                                i < constants.map_dim - 1
+                                and self.map_frequencies[i + 1][j][constants.LEFT] != 0
+                            ):
                                 graph[i][j][k] = 1
                         elif k == constants.DOWN:
-                            if j < constants.map_dim-1 and self.map_frequencies[i][j+1][constants.UP] != 0:
+                            if (
+                                j < constants.map_dim - 1
+                                and self.map_frequencies[i][j + 1][constants.UP] != 0
+                            ):
                                 graph[i][j][k] = 1
                         elif k == constants.UP:
-                            if j > 0 and self.map_frequencies[i][j-1][constants.DOWN] != 0:
+                            if (
+                                j > 0
+                                and self.map_frequencies[i][j - 1][constants.DOWN] != 0
+                            ):
                                 graph[i][j][k] = 1
-
 
         # Create a visited array to keep track of visited cells
         visited = np.zeros((constants.map_dim, constants.map_dim), dtype=int)
@@ -317,7 +394,11 @@ class TimingMazeGame:
                     # Get the adjacent cell
                     adj_x = row + self.dRow[door_type]
                     adj_y = col + self.dCol[door_type]
-                    if 0 <= adj_x < constants.map_dim and  0 <= adj_y < constants.map_dim and visited[adj_x][adj_y] == 0:
+                    if (
+                        0 <= adj_x < constants.map_dim
+                        and 0 <= adj_y < constants.map_dim
+                        and visited[adj_x][adj_y] == 0
+                    ):
                         q.append((adj_x, adj_y))
                         visited[adj_x][adj_y] = 1
 
@@ -356,23 +437,28 @@ class TimingMazeGame:
         self.logger.debug("Drone visual took {:.3f}s".format(drone_visual_time))
 
         # Create the state object for the player
-        before_state = TimingMazeState(maze_state, is_end_visible,
-                                       self.end_pos[0]-self.cur_pos[0], self.end_pos[1]-self.cur_pos[1],
-                                       self.start_pos[0]-self.cur_pos[0], self.start_pos[1]-self.cur_pos[1])
+        before_state = TimingMazeState(
+            maze_state,
+            is_end_visible,
+            self.end_pos[0] - self.cur_pos[0],
+            self.end_pos[1] - self.cur_pos[1],
+            self.start_pos[0] - self.cur_pos[0],
+            self.start_pos[1] - self.cur_pos[1],
+        )
         returned_action = None
         if not self.player_timeout:
             player_start = time.time()
             try:
                 # Call the player's move function for turn on this move
-                returned_action = self.player.move(
-                    current_percept=before_state
-                )
+                returned_action = self.player.move(current_percept=before_state)
             except Exception as e:
                 print(f"Exception in player code: {e}")
                 returned_action = None
 
             player_time_taken = time.time() - player_start
-            self.logger.debug("Player {} took {:.3f}s".format(self.player_name, player_time_taken))
+            self.logger.debug(
+                "Player {} took {:.3f}s".format(self.player_name, player_time_taken)
+            )
 
             self.player_time -= player_time_taken
             if self.player_time <= 0:
@@ -386,18 +472,31 @@ class TimingMazeGame:
                 self.logger.debug("Received move from {}".format(self.player_name))
                 self.valid_moves += 1
             else:
-                print("Invalid move as trying to cross some uncrossable boundaries hence cancelled: ", move,
-                      self.cur_pos[0], self.cur_pos[1], self.end_pos[0], self.end_pos[1])
-                self.logger.info("Invalid move from {} as it does not follow the rules".format(self.player_name))
+                print(
+                    "Invalid move as trying to cross some uncrossable boundaries hence cancelled: ",
+                    move,
+                    self.cur_pos[0],
+                    self.cur_pos[1],
+                    self.end_pos[0],
+                    self.end_pos[1],
+                )
+                self.logger.info(
+                    "Invalid move from {} as it does not follow the rules".format(
+                        self.player_name
+                    )
+                )
         else:
             print("Invalid move")
-            self.logger.info("Invalid move from {} as it doesn't follow the return format".format(self.player_name))
+            self.logger.info(
+                "Invalid move from {} as it doesn't follow the return format".format(
+                    self.player_name
+                )
+            )
 
         if self.use_gui:
             self.draw_grid()
 
         self.update_door_state()
-
 
         print("Turn {} complete".format(self.turns))
 
@@ -405,7 +504,11 @@ class TimingMazeGame:
             self.game_state = "over"
             print("Goal reached!\n\n Turns taken: {}\n".format(self.turns))
             self.end_time = time.time()
-            print("\nTime taken: {}\nValid moves: {}\n".format(self.end_time - self.start_time, self.valid_moves))
+            print(
+                "\nTime taken: {}\nValid moves: {}\n".format(
+                    self.end_time - self.start_time, self.valid_moves
+                )
+            )
             return
 
         if self.turns < self.max_turns:
@@ -421,7 +524,11 @@ class TimingMazeGame:
             print("Goal not reached...\n\n")
             self.game_state = "over"
             self.end_time = time.time()
-            print("\nTime taken: {}\nValid moves: {}\n".format(self.end_time - self.start_time, self.valid_moves))
+            print(
+                "\nTime taken: {}\nValid moves: {}\n".format(
+                    self.end_time - self.start_time, self.valid_moves
+                )
+            )
             return
 
     @staticmethod
@@ -456,80 +563,120 @@ class TimingMazeGame:
         # calculate the distance between the drone and three points of the door,
         # centre and the two ends of the door. If any of these points are visible from the drone,
         # then the door is visible from the drone
-        drone_x = self.cur_pos[0]+0.5
-        drone_y = self.cur_pos[1]+0.5
+        drone_x = self.cur_pos[0] + 0.5
+        drone_y = self.cur_pos[1] + 0.5
         distance = 0
 
         if door_type == constants.LEFT:
             # calculate the distance between the drone and the centre of the door
             door_x = row
             door_y = col + 0.5
-            distance = self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y)
+            distance = self.get_euclidean_distance_between_two_points(
+                drone_x, drone_y, door_x, door_y
+            )
 
             # calculate the distance between the drone and the bottom end of the door
             door_x = row
             door_y = col + 1
-            distance = min(distance,
-                self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
 
             # calculate the distance between the drone and the top end of the door
             door_x = row
             door_y = col
-            distance = min(distance,
-                self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
 
         elif door_type == constants.RIGHT:
             # calculate the distance between the drone and the centre of the door
             door_x = row + 1
             door_y = col + 0.5
-            distance = self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y)
+            distance = self.get_euclidean_distance_between_two_points(
+                drone_x, drone_y, door_x, door_y
+            )
 
             # calculate the distance between the drone and the bottom end of the door
             door_x = row + 1
             door_y = col + 1
-            distance = min(distance,
-                           self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
 
             # calculate the distance between the drone and the top end of the door
             door_x = row + 1
             door_y = col
-            distance = min(distance,
-                           self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
 
         elif door_type == constants.UP:
             # calculate the distance between the drone and the centre of the door
             door_x = row + 0.5
             door_y = col
-            distance = self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y)
+            distance = self.get_euclidean_distance_between_two_points(
+                drone_x, drone_y, door_x, door_y
+            )
 
             # calculate the distance between the drone and the left end of the door
             door_x = row
             door_y = col
-            distance = min(distance,
-                           self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
 
             # calculate the distance between the drone and the right end of the door
             door_x = row + 1
             door_y = col
-            distance = min(distance,
-                           self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
         elif door_type == constants.DOWN:
             # calculate the distance between the drone and the centre of the door
             door_x = row + 0.5
             door_y = col + 1
-            distance = self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y)
+            distance = self.get_euclidean_distance_between_two_points(
+                drone_x, drone_y, door_x, door_y
+            )
 
             # calculate the distance between the drone and the left end of the door
             door_x = row
             door_y = col + 1
-            distance = min(distance,
-                           self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
 
             # calculate the distance between the drone and the right end of the door
             door_x = row + 1
             door_y = col + 1
-            distance = min(distance,
-                           self.get_euclidean_distance_between_two_points(drone_x, drone_y, door_x, door_y))
+            distance = min(
+                distance,
+                self.get_euclidean_distance_between_two_points(
+                    drone_x, drone_y, door_x, door_y
+                ),
+            )
         return distance <= self.radius
 
     # Function to perform the BFS traversal
@@ -538,7 +685,9 @@ class TimingMazeGame:
 
         # Stores indices of the matrix cells
         q = queue()
-        vis = [[False for _ in range(constants.map_dim)] for _ in range(constants.map_dim)]
+        vis = [
+            [False for _ in range(constants.map_dim)] for _ in range(constants.map_dim)
+        ]
         is_end_visible = False
 
         # Mark the starting cell as visited
@@ -562,7 +711,9 @@ class TimingMazeGame:
                 # Get the distance of door from middle of current cell
                 # If the distance is less than or equal to r then the door is a part of the drone visual
                 # Otherwise it is not
-                if not self.validate_distance_between_drone_and_door(row, col, door_type):
+                if not self.validate_distance_between_drone_and_door(
+                    row, col, door_type
+                ):
                     continue
 
                 any_part_visible = True
@@ -570,17 +721,59 @@ class TimingMazeGame:
                 # if door is a part of the drone visual
                 # add to state whether they are open, closed or at boundary
                 if row == 0 and door_type == constants.UP:
-                    state.append((row-self.cur_pos[0], col-self.cur_pos[1], door_type, constants.BOUNDARY))
-                elif row == constants.map_dim-1 and door_type == constants.DOWN:
-                    state.append((row-self.cur_pos[0], col-self.cur_pos[1], door_type, constants.BOUNDARY))
+                    state.append(
+                        (
+                            row - self.cur_pos[0],
+                            col - self.cur_pos[1],
+                            door_type,
+                            constants.BOUNDARY,
+                        )
+                    )
+                elif row == constants.map_dim - 1 and door_type == constants.DOWN:
+                    state.append(
+                        (
+                            row - self.cur_pos[0],
+                            col - self.cur_pos[1],
+                            door_type,
+                            constants.BOUNDARY,
+                        )
+                    )
                 elif col == 0 and door_type == constants.LEFT:
-                    state.append((row-self.cur_pos[0], col-self.cur_pos[1], door_type, constants.BOUNDARY))
-                elif col == constants.map_dim-1 and door_type == constants.RIGHT:
-                    state.append((row-self.cur_pos[0], col-self.cur_pos[1], door_type, constants.BOUNDARY))
+                    state.append(
+                        (
+                            row - self.cur_pos[0],
+                            col - self.cur_pos[1],
+                            door_type,
+                            constants.BOUNDARY,
+                        )
+                    )
+                elif col == constants.map_dim - 1 and door_type == constants.RIGHT:
+                    state.append(
+                        (
+                            row - self.cur_pos[0],
+                            col - self.cur_pos[1],
+                            door_type,
+                            constants.BOUNDARY,
+                        )
+                    )
                 elif self.map_state[row][col][door_type] == 1:
-                    state.append((row-self.cur_pos[0], col-self.cur_pos[1], door_type, constants.OPEN))
+                    state.append(
+                        (
+                            row - self.cur_pos[0],
+                            col - self.cur_pos[1],
+                            door_type,
+                            constants.OPEN,
+                        )
+                    )
                 else:
-                    state.append((row-self.cur_pos[0], col-self.cur_pos[1], door_type, constants.CLOSED))
+                    state.append(
+                        (
+                            row - self.cur_pos[0],
+                            col - self.cur_pos[1],
+                            door_type,
+                            constants.CLOSED,
+                        )
+                    )
 
             # Go to the adjacent cells if any part is visible
             if not any_part_visible:
@@ -628,23 +821,35 @@ class TimingMazeGame:
         cur_y = self.cur_pos[1]
         cur_x = self.cur_pos[0]
         if move == constants.LEFT:
-            if (cur_x != 0 and self.map_state[cur_x][cur_y][constants.LEFT] == 1
-                    and self.map_state[cur_x-1][cur_y][constants.RIGHT] == 1):
+            if (
+                cur_x != 0
+                and self.map_state[cur_x][cur_y][constants.LEFT] == 1
+                and self.map_state[cur_x - 1][cur_y][constants.RIGHT] == 1
+            ):
                 self.cur_pos[0] -= 1
                 return True
         elif move == constants.UP:
-            if (cur_y != 0 and self.map_state[cur_x][cur_y][constants.UP] == 1
-                    and self.map_state[cur_x][cur_y-1][constants.DOWN] == 1):
+            if (
+                cur_y != 0
+                and self.map_state[cur_x][cur_y][constants.UP] == 1
+                and self.map_state[cur_x][cur_y - 1][constants.DOWN] == 1
+            ):
                 self.cur_pos[1] -= 1
                 return True
         elif move == constants.RIGHT:
-            if (cur_x != constants.map_dim - 1 and self.map_state[cur_x][cur_y][constants.RIGHT] == 1
-                    and self.map_state[cur_x+1][cur_y][constants.LEFT] == 1):
+            if (
+                cur_x != constants.map_dim - 1
+                and self.map_state[cur_x][cur_y][constants.RIGHT] == 1
+                and self.map_state[cur_x + 1][cur_y][constants.LEFT] == 1
+            ):
                 self.cur_pos[0] += 1
                 return True
         elif move == constants.DOWN:
-            if (cur_y != constants.map_dim - 1 and self.map_state[cur_x][cur_y][constants.DOWN] == 1
-                    and self.map_state[cur_x][cur_y+1][constants.UP] == 1):
+            if (
+                cur_y != constants.map_dim - 1
+                and self.map_state[cur_x][cur_y][constants.DOWN] == 1
+                and self.map_state[cur_x][cur_y + 1][constants.UP] == 1
+            ):
                 self.cur_pos[1] += 1
                 return True
         elif move == constants.WAIT:
@@ -653,8 +858,8 @@ class TimingMazeGame:
 
     def get_state(self):
         return_dict = dict()
-        return_dict['map_state'] = self.map_state
-        return_dict['cur_pos'] = self.cur_pos
+        return_dict["map_state"] = self.map_state
+        return_dict["cur_pos"] = self.cur_pos
         return return_dict
 
     def draw_grid(self):
@@ -662,60 +867,134 @@ class TimingMazeGame:
 
         for i in range(constants.map_dim):
             for j in range(constants.map_dim):
-                x1, y1 = self.x_offset + i * constants.CELL_SIZE, self.y_offset + j * constants.CELL_SIZE
+                x1, y1 = (
+                    self.x_offset + i * constants.CELL_SIZE,
+                    self.y_offset + j * constants.CELL_SIZE,
+                )
                 x2, y2 = x1 + constants.CELL_SIZE, y1 + constants.CELL_SIZE
 
                 # Draw the cell's doors based on door_states
                 if self.map_state[i][j][constants.UP] != 1:  # Top door
-                    self.canvas.create_line(x1, y1+0.5, x2, y1+0.5, fill="blue", width = 0.5)
+                    self.canvas.create_line(
+                        x1, y1 + 0.5, x2, y1 + 0.5, fill="blue", width=0.5
+                    )
                 if self.map_state[i][j][constants.RIGHT] != 1:  # Right door
-                    self.canvas.create_line(x2-0.5, y1, x2-0.5, y2, fill="blue", width = 0.5)
+                    self.canvas.create_line(
+                        x2 - 0.5, y1, x2 - 0.5, y2, fill="blue", width=0.5
+                    )
                 if self.map_state[i][j][constants.DOWN] != 1:  # Bottom door
-                    self.canvas.create_line(x1, y2-0.5, x2, y2-0.5, fill="red", width = 0.5)
+                    self.canvas.create_line(
+                        x1, y2 - 0.5, x2, y2 - 0.5, fill="red", width=0.5
+                    )
                 if self.map_state[i][j][constants.LEFT] != 1:  # Left door
-                    self.canvas.create_line(x1+0.5, y1, x1+0.5, y2, fill="red", width = 0.5)
+                    self.canvas.create_line(
+                        x1 + 0.5, y1, x1 + 0.5, y2, fill="red", width=0.5
+                    )
 
         # Mark the start, cur, and end positions
         self.mark_position(self.start_pos, "green")
         self.mark_position(self.cur_pos, "orange", True)
         self.mark_position(self.end_pos, "red")
         self.create_buttons()
-        self.canvas.create_text(650, 20, text="Turns: {}".format(self.turns), font=("Arial", 14), fill="black",
-                                                  activefill="gray", tags="turns text")
-        self.canvas.create_text(750, 20, text="Start Pos: {}".format(self.start_pos), font=("Arial", 14), fill="black",
-                                activefill="gray", tags="turns text")
-        self.canvas.create_text(900, 20, text="End Pos: {}".format(self.end_pos), font=("Arial", 14), fill="black",
-                                activefill="gray", tags="turns text")
-        self.canvas.create_text(1050, 20, text="Cur Pos: {}".format(self.cur_pos), font=("Arial", 14), fill="black",
-                                activefill="gray", tags="turns text")
+        self.canvas.create_text(
+            650,
+            20,
+            text="Turns: {}".format(self.turns),
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="turns text",
+        )
+        self.canvas.create_text(
+            750,
+            20,
+            text="Start Pos: {}".format(self.start_pos),
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="turns text",
+        )
+        self.canvas.create_text(
+            900,
+            20,
+            text="End Pos: {}".format(self.end_pos),
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="turns text",
+        )
+        self.canvas.create_text(
+            1050,
+            20,
+            text="Cur Pos: {}".format(self.cur_pos),
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="turns text",
+        )
 
     def create_buttons(self):
         # Create text-based "Pause" button on the canvas
-        self.pause_btn = self.canvas.create_text(250, 20, text="Pause", font=("Arial", 14), fill="black",
-                                                 activefill="gray", tags="pause_button")
+        self.pause_btn = self.canvas.create_text(
+            250,
+            20,
+            text="Pause",
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="pause_button",
+        )
         self.canvas.tag_bind("pause_button", "<Button-1>", lambda e: self.pause())
 
         # Create a text-based "Reset" button on the canvas
-        self.resume_btn = self.canvas.create_text(350, 20, text="Start/Resume", font=("Arial", 14), fill="black",
-                                                  activefill="gray", tags="resume_button")
+        self.resume_btn = self.canvas.create_text(
+            350,
+            20,
+            text="Start/Resume",
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="resume_button",
+        )
         self.canvas.tag_bind("resume_button", "<Button-1>", lambda e: self.resume())
 
-        self.resume_btn = self.canvas.create_text(450, 20, text="1X/4X", font=("Arial", 14), fill="black",
-                                                  activefill="gray", tags="speed_button")
-        self.canvas.tag_bind("speed_button", "<Button-1>", lambda e: self.toggle_speed())
+        self.resume_btn = self.canvas.create_text(
+            450,
+            20,
+            text="1X/4X",
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="speed_button",
+        )
+        self.canvas.tag_bind(
+            "speed_button", "<Button-1>", lambda e: self.toggle_speed()
+        )
 
-        self.step_btn = self.canvas.create_text(550, 20, text="Step", font=("Arial", 14), fill="black",
-                                                  activefill="gray", tags="step_button")
+        self.step_btn = self.canvas.create_text(
+            550,
+            20,
+            text="Step",
+            font=("Arial", 14),
+            fill="black",
+            activefill="gray",
+            tags="step_button",
+        )
         self.canvas.tag_bind("step_button", "<Button-1>", lambda e: self.step())
 
-    def mark_position(self, pos, color, withCircle = False):
+    def mark_position(self, pos, color, withCircle=False):
         x, y = pos
 
-        x1, y1 = self.x_offset + x * constants.CELL_SIZE + 2, self.y_offset + y * constants.CELL_SIZE + 2
-        x2, y2 = x1+5, y1+5
+        x1, y1 = (
+            self.x_offset + x * constants.CELL_SIZE + 2,
+            self.y_offset + y * constants.CELL_SIZE + 2,
+        )
+        x2, y2 = x1 + 5, y1 + 5
         self.canvas.create_rectangle(x1, y1, x2, y2, fill=color)
 
         if withCircle:
             cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
-            r = self.radius*constants.CELL_SIZE
-            self.canvas.create_oval(cx - r, cy - r, cx + r, cy + r, fill="", outline="blue", width=1)
+            r = self.radius * constants.CELL_SIZE
+            self.canvas.create_oval(
+                cx - r, cy - r, cx + r, cy + r, fill="", outline="blue", width=1
+            )

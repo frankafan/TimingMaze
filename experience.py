@@ -4,16 +4,30 @@ import numpy as np
 
 
 class Experience:
-    def __init__(self, L, r, wait_penalty):
+    def __init__(
+        self,
+        L,
+        r,
+        wait_penalty=0.2,
+        revisit_penalty=0.1,
+        revisit_max_penalty=1,
+        direction_vector_max_weight=2,
+        direction_vector_multiplier=0.01,
+        direction_vector_pov_radius=30,
+    ):
         # Hyper-parameters
         self.wait_penalty = wait_penalty  # penalty for waiting
-        self.revisit_penalty = 0.1  # penalty for revisiting a cell
-        self.revisit_max_penalty = 1  # maximum penalty for revisiting a cell
-        self.direction_vector_max_weight = 2  # maximum weight of the direction vector
-        self.direction_vector_multiplier = 0.01  # multiplier for the direction vector
-        self.direction_vector_pov_radius = (
-            30  # radius of the field of view for the direction vector
+        self.revisit_penalty = revisit_penalty  # penalty for revisiting a cell
+        self.revisit_max_penalty = (
+            revisit_max_penalty  # maximum penalty for revisiting a cell
         )
+        self.direction_vector_max_weight = (
+            direction_vector_max_weight  # maximum weight of the direction vector
+        )
+        self.direction_vector_multiplier = (
+            direction_vector_multiplier  # multiplier for the direction vector
+        )
+        self.direction_vector_pov_radius = direction_vector_pov_radius  # radius of the field of view for the direction vector
 
         self.L = L
         self.r = r

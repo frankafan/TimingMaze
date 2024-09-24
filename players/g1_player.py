@@ -16,6 +16,12 @@ class Player:
         precomp_dir: str,
         maximum_door_frequency: int,
         radius: int,
+        wait_penalty: int,
+        revisit_penalty: int,
+        revisit_max_penalty: int,
+        direction_vector_max_weight: int,
+        direction_vector_multiplier: int,
+        direction_vector_pov_radius: int,
     ) -> None:
         """Initialise the player with the basic amoeba information
 
