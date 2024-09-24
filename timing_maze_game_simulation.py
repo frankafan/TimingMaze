@@ -470,7 +470,7 @@ class TimingMazeGame:
         if self.check_action(returned_action):
             move = returned_action
             if self.check_and_apply_move(move):
-                print("Move Accepted! New position", self.cur_pos)
+                # print("Move Accepted! New position", self.cur_pos)
                 self.logger.debug("Received move from {}".format(self.player_name))
                 self.valid_moves += 1
             else:
@@ -500,7 +500,7 @@ class TimingMazeGame:
 
         self.update_door_state()
 
-        print("Turn {} complete".format(self.turns))
+        # print("Turn {} complete".format(self.turns))
 
         if self.cur_pos[0] == self.end_pos[0] and self.cur_pos[1] == self.end_pos[1]:
             self.game_state = "over"

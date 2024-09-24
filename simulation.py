@@ -40,6 +40,11 @@ def run_simulation(
                                     for (
                                         direction_vector_pov_radius
                                     ) in direction_vector_pov_radii:
+
+                                        print(
+                                            f"Running simulation for max_door_frequency={max_door_frequency}, radius={radius}, seed={seed}, wait_penalty={wait_penalty}, revisit_penalty={revisit_penalty}, revisit_max_penalty={revisit_max_penalty}, direction_vector_max_weight={direction_vector_max_weight}, direction_vector_multiplier={direction_vector_multiplier}, direction_vector_pov_radius={direction_vector_pov_radius}"
+                                        )
+
                                         args = argparse.Namespace(
                                             max_door_frequency=max_door_frequency,
                                             radius=radius,
