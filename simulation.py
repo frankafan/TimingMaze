@@ -9,7 +9,7 @@ import tkinter as tk
 import sys
 
 sys.setrecursionlimit(10000)
-output_dir = "vm1_simulation_results"
+output_dir = "vm2_simulation_results"
 
 
 def run_simulation(
@@ -165,7 +165,7 @@ def convert_numpy_types(data):
 
 
 def main():
-    max_door_frequencies = [10]
+    max_door_frequencies = [20]
     radii = [5, 20, 40]
     num_maps_per_config = 3
     wait_penalties = [0.2, 0.4]
