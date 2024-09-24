@@ -56,7 +56,7 @@ def run_simulation(
                                                 scale=9,
                                                 no_gui=True,
                                                 log_path=f"logs/mdf{max_door_frequency}_r{radius}_s{seed}.log",
-                                                disable_logging=True,
+                                                disable_logging=False,
                                                 disable_timeout=True,
                                                 player="1",
                                                 wait_penalty=wait_penalty,
