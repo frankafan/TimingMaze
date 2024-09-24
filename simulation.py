@@ -8,7 +8,7 @@ from collections import defaultdict
 import tkinter as tk
 import sys
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(1000000)
 output_dir = "vm2_simulation_results"
 
 
