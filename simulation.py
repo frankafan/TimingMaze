@@ -9,6 +9,7 @@ import tkinter as tk
 import sys
 
 sys.setrecursionlimit(10000)
+output_dir = "simulation_results"
 
 
 def run_simulation(
@@ -27,19 +28,17 @@ def run_simulation(
 
     for max_door_frequency in max_door_frequencies:
         for radius in radii:
-            for seed in range(num_maps_per_config):
-                for wait_penalty in wait_penalties:
-                    for revisit_penalty in revisit_penalties:
-                        for revisit_max_penalty in revisit_max_penalties:
+            for wait_penalty in wait_penalties:
+                for revisit_penalty in revisit_penalties:
+                    for revisit_max_penalty in revisit_max_penalties:
+                        for direction_vector_max_weight in direction_vector_max_weights:
                             for (
-                                direction_vector_max_weight
-                            ) in direction_vector_max_weights:
+                                direction_vector_multiplier
+                            ) in direction_vector_multipliers:
                                 for (
-                                    direction_vector_multiplier
-                                ) in direction_vector_multipliers:
-                                    for (
-                                        direction_vector_pov_radius
-                                    ) in direction_vector_pov_radii:
+                                    direction_vector_pov_radius
+                                ) in direction_vector_pov_radii:
+                                    for seed in range(num_maps_per_config):
 
                                         print(
                                             f"Running simulation for max_door_frequency={max_door_frequency}, radius={radius}, seed={seed}, wait_penalty={wait_penalty}, revisit_penalty={revisit_penalty}, revisit_max_penalty={revisit_max_penalty}, direction_vector_max_weight={direction_vector_max_weight}, direction_vector_multiplier={direction_vector_multiplier}, direction_vector_pov_radius={direction_vector_pov_radius}"
@@ -110,6 +109,8 @@ def run_simulation(
                                                     "direction_vector_pov_radius": direction_vector_pov_radius,
                                                 }
                                             )
+                                save_results(results, output_dir)
+                                save_summary(summary, output_dir)
 
     return results, summary
 
@@ -166,9 +167,6 @@ def main():
     direction_vector_multipliers = [0.01, 0.05, 0.1]
     direction_vector_pov_radii = [25, 50]
 
-    output_dir = "simulation_results"
-
-    all_summary = []
 
     results, summary = run_simulation(
         max_door_frequencies,
@@ -182,13 +180,8 @@ def main():
         direction_vector_pov_radii,
     )
     save_results(results, output_dir)
-    all_summary.extend(summary)
+    save_summary(summary, output_dir)
     print(f"Simulation complete")
-
-    save_summary(all_summary, output_dir)
-    print(
-        "All simulations completed. Results and summary saved in the 'simulation_results' directory."
-    )
 
 
 if __name__ == "__main__":
