@@ -77,7 +77,7 @@ def run_simulation(
                                             }
                                             # Convert tuple to string for JSON compatibility
                                             results[
-                                                f"mdf_{max_door_frequency}_r_{radius}_s_{seed}"
+                                                f"mdf_{max_door_frequency}_r_{radius}_s_{seed}_wp_{wait_penalty}_rp_{revisit_penalty}_rmp_{revisit_max_penalty}_dw_{direction_vector_max_weight}_dm_{direction_vector_multiplier}_dr_{direction_vector_pov_radius}"
                                             ].append(result)
 
                                             summary.append(
@@ -89,6 +89,12 @@ def run_simulation(
                                                     "goal_reached": result[
                                                         "goal_reached"
                                                     ],
+                                                    "wait_penalty": wait_penalty,
+                                                    "revisit_penalty": revisit_penalty,
+                                                    "revisit_max_penalty": revisit_max_penalty,
+                                                    "direction_vector_max_weight": direction_vector_max_weight,
+                                                    "direction_vector_multiplier": direction_vector_multiplier,
+                                                    "direction_vector_pov_radius": direction_vector_pov_radius,
                                                 }
                                             )
 
@@ -117,10 +123,12 @@ def save_summary(summary, output_dir):
 
     output_file = os.path.join(output_dir, "simulation_summary.csv")
     with open(output_file, "w") as f:
-        f.write("max_door_frequency,radius,seed,turns,goal_reached\n")
+        f.write(
+            "max_door_frequency,radius,seed,turns,goal_reached,wait_penalty,revisit_penalty,revisit_max_penalty,direction_vector_max_weight,direction_vector_multiplier,direction_vector_pov\n"
+        )
         for entry in summary:
             f.write(
-                f"{entry['max_door_frequency']},{entry['radius']},{entry['seed']},{entry['turns']},{entry['goal_reached']}\n"
+                f"{entry['max_door_frequency']},{entry['radius']},{entry['seed']},{entry['turns']},{entry['goal_reached']},{entry['wait_penalty']},{entry['revisit_penalty']},{entry['revisit_max_penalty']},{entry['direction_vector_max_weight']},{entry['direction_vector_multiplier']},{entry['direction_vector_pov_radius']}\n"
             )
 
 

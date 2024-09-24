@@ -143,7 +143,7 @@ class TimingMazeGame:
                     revisit_penalty=self.revisit_penalty,
                     revisit_max_penalty=self.revisit_max_penalty,
                     direction_vector_max_weight=self.direction_vector_max_weight,
-                    direction_vector_multiplier=selfdirection_vector_multiplier,
+                    direction_vector_multiplier=self.direction_vector_multiplier,
                     direction_vector_pov_radius=self.direction_vector_pov_radius,
                 )
                 if self.use_timeout:
