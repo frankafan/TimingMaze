@@ -92,7 +92,7 @@ class TimingMazeGame:
         self.radius = args.radius
         self.goal_reached = False
         self.turns = 0
-        self.max_turns = 10000
+        self.max_turns = self.max_door_frequency * 500
         self.valid_moves = 0
         self.map_state = np.zeros((constants.map_dim, constants.map_dim, 4), dtype=int)
         self.map_frequencies = np.zeros(

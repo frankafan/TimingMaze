@@ -158,13 +158,13 @@ def convert_numpy_types(data):
 def main():
     max_door_frequencies = [3, 5, 10, 20]
     radii = [5, 20, 40, 150]
-    num_maps_per_config = 1
-    wait_penalties = [0.1, 0.15, 0.2, 0.3]
-    revisit_penalties = [0.1, 0.15, 0.2, 0.3]
-    revisit_max_penalties = [0.5, 0.75, 1, 2, 3]
+    num_maps_per_config = 50
+    wait_penalties = [0.1, 0.2, 0.3]
+    revisit_penalties = [0.1, 0.2, 0.3]
+    revisit_max_penalties = [0.5, 1, 2, 3]
     direction_vector_max_weights = [0.5, 1, 2, 3]
     direction_vector_multipliers = [0.01, 0.05, 0.1]
-    direction_vector_pov_radii = [20, 30, 40]
+    direction_vector_pov_radii = [25, 50]
 
     output_dir = "simulation_results"
 
