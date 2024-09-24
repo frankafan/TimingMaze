@@ -165,9 +165,9 @@ def convert_numpy_types(data):
 
 
 def main():
-    max_door_frequencies = [3, 10, 20]
+    max_door_frequencies = [10]
     radii = [5, 20, 40]
-    num_maps_per_config = 10
+    num_maps_per_config = 3
     wait_penalties = [0.1, 0.2, 0.3]
     wait_max_penalties = [3, 5]
     revisit_penalties = [0.15, 0.3]
