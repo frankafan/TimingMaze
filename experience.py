@@ -141,13 +141,22 @@ class Experience:
     def get_direction_vector(self):
         direction_vector = [0, 0]  # [x, y]
         for x in range(
-            max(self.cur_pos[0] - self.direction_vector_pov_radius, self.walls[2]),
-            min(self.cur_pos[0] + self.direction_vector_pov_radius, self.walls[0]),
+            max(
+                self.cur_pos[0] - self.r - self.direction_vector_pov_radius,
+                self.walls[2],
+            ),
+            min(
+                self.cur_pos[0] + self.r + self.direction_vector_pov_radius,
+                self.walls[0],
+            ),
         ):
             for y in range(
-                max(self.cur_pos[1] - self.direction_vector_pov_radius, self.walls[3]),
+                max(
+                    self.cur_pos[1] - self.r - self.direction_vector_pov_radius,
+                    self.walls[3],
+                ),
                 min(
-                    self.cur_pos[1] + self.direction_vector_pov_radius + 1,
+                    self.cur_pos[1] + self.r + self.direction_vector_pov_radius + 1,
                     self.walls[1],
                 ),
             ):
