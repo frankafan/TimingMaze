@@ -131,9 +131,6 @@ class TimingMazeGame:
 
             start_time = 0
             is_timeout = False
-            if self.use_timeout:
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(constants.timeout)
             try:
                 start_time = time.time()
                 player = player_class(
@@ -150,8 +147,6 @@ class TimingMazeGame:
                     direction_vector_multiplier=self.direction_vector_multiplier,
                     direction_vector_pov_radius=self.direction_vector_pov_radius,
                 )
-                if self.use_timeout:
-                    signal.alarm(0)  # Clear alarm
             except TimeoutException:
                 is_timeout = True
                 player = None
